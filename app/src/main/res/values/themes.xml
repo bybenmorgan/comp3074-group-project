@@ -1,9 +1,16 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.COMP3074GroupProject" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources>
+    <style name="Theme.HouseholdPalette" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/dashboard_outline</item>
+        <item name="colorOnPrimary">@color/dashboard_cream</item>
+        <item name="colorSecondary">@color/dashboard_sage</item>
+        <item name="colorOnSecondary">@color/dashboard_text</item>
+        <item name="colorSurface">@color/dashboard_cream</item>
+        <item name="colorOnSurface">@color/dashboard_text</item>
+        <item name="android:colorBackground">@color/dashboard_cream</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
+    <style name="Base.Theme.COMP3074GroupProject" parent="Theme.HouseholdPalette" />
     <style name="Theme.COMP3074GroupProject" parent="Base.Theme.COMP3074GroupProject" />
 </resources>

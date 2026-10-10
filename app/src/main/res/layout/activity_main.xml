@@ -1,19 +1,331 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dashboard_cream"
+    android:fillViewport="true"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dashboard"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Household.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="28dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:minHeight="88dp"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:accessibilityHeading="true"
+                        android:text="@string/dashboard_title"
+                        android:textAppearance="@style/TextAppearance.Household.Heading"
+                        android:textSize="25sp"
+                        android:textStyle="normal" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.Household.Card"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        app:cardBackgroundColor="@color/dashboard_lavender"
+                        app:cardCornerRadius="24dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/profile_placeholder"
+                            android:padding="12dp"
+                            app:srcCompat="@drawable/ic_profile" />
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Household.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:accessibilityHeading="true"
+                        android:padding="16dp"
+                        android:text="@string/noticeboard_title"
+                        android:textAppearance="@style/TextAppearance.Household.Heading" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_status_row"
+                        android:minHeight="144dp"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            style="@style/Widget.Household.ListItem"
+                            android:text="@string/notice_groceries" />
+
+                        <TextView
+                            style="@style/Widget.Household.ListItem"
+                            android:text="@string/notice_maintenance" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="56dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical"
+                    android:paddingTop="16dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/feature_dashboard"
+                        style="@style/Widget.Household.FeatureButton"
+                        android:contentDescription="@string/feature_dashboard"
+                        app:backgroundTint="@color/dashboard_cream"
+                        app:icon="@drawable/ic_dashboard"
+                        app:strokeColor="@color/dashboard_outline"
+                        app:strokeWidth="2dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/feature_chores"
+                        style="@style/Widget.Household.FeatureButton"
+                        android:layout_marginTop="16dp"
+                        android:contentDescription="@string/feature_chores"
+                        app:backgroundTint="@color/dashboard_muted_green"
+                        app:icon="@drawable/ic_chores" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/feature_groceries"
+                        style="@style/Widget.Household.FeatureButton"
+                        android:layout_marginTop="16dp"
+                        android:contentDescription="@string/feature_groceries"
+                        app:backgroundTint="@color/dashboard_blush"
+                        app:icon="@drawable/ic_groceries" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/feature_pet_care"
+                        style="@style/Widget.Household.FeatureButton"
+                        android:layout_marginTop="16dp"
+                        android:contentDescription="@string/feature_pet_care"
+                        app:backgroundTint="@color/dashboard_taupe"
+                        app:icon="@drawable/ic_pet" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/feature_expenses"
+                        style="@style/Widget.Household.FeatureButton"
+                        android:layout_marginTop="16dp"
+                        android:contentDescription="@string/feature_expenses"
+                        app:backgroundTint="@color/dashboard_yellow"
+                        app:icon="@drawable/ic_expenses" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.Household.Card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="14dp">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/events_day"
+                                        android:textAppearance="@style/TextAppearance.Household.Heading" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:accessibilityHeading="true"
+                                        android:text="@string/events_title"
+                                        android:textAppearance="@style/TextAppearance.Household.Caption" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/events_date"
+                                    android:textAppearance="@style/TextAppearance.Household.Heading"
+                                    android:textSize="20sp"
+                                    android:textStyle="normal" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_status_row"
+                                android:orientation="vertical"
+                                android:padding="14dp">
+
+                                <TextView
+                                    style="@style/Widget.Household.ListItem"
+                                    android:text="@string/event_chore" />
+
+                                <TextView
+                                    style="@style/Widget.Household.ListItem"
+                                    android:text="@string/event_bill" />
+
+                                <TextView
+                                    style="@style/Widget.Household.ListItem"
+                                    android:text="@string/event_appointment" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/Widget.Household.Card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:accessibilityHeading="true"
+                                android:text="@string/pet_title"
+                                android:textAppearance="@style/TextAppearance.Household.Heading"
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_status_row"
+                                android:drawableStart="@drawable/ic_pet"
+                                android:drawablePadding="8dp"
+                                android:gravity="center_vertical"
+                                android:minHeight="48dp"
+                                android:padding="10dp"
+                                android:text="@string/pet_status"
+                                android:textAppearance="@style/TextAppearance.Household.Body" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_status_row"
+                                android:gravity="center_vertical"
+                                android:minHeight="48dp"
+                                android:orientation="horizontal"
+                                android:padding="10dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:text="@string/pet_walked"
+                                    android:textAppearance="@style/TextAppearance.Household.Body" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawableEnd="@drawable/ic_check"
+                                    android:drawablePadding="4dp"
+                                    android:text="@string/pet_done"
+                                    android:textAppearance="@style/TextAppearance.Household.Caption" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/bg_status_row"
+                                android:gravity="center_vertical"
+                                android:minHeight="48dp"
+                                android:orientation="horizontal"
+                                android:padding="10dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:text="@string/pet_fed"
+                                    android:textAppearance="@style/TextAppearance.Household.Body" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawableEnd="@drawable/ic_check"
+                                    android:drawablePadding="4dp"
+                                    android:text="@string/pet_done"
+                                    android:textAppearance="@style/TextAppearance.Household.Caption" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">COMP3074 Group Project</string>
+    <string name="dashboard_title">Household Manager</string>
+    <string name="profile_placeholder">Household profile placeholder</string>
+    <string name="noticeboard_title">Noticeboard</string>
+    <string name="notice_groceries">Need carrots</string>
+    <string name="notice_maintenance">Maintenance coming to fix the stove</string>
+    <string name="events_day">Monday</string>
+    <string name="events_date">12\nOCT</string>
+    <string name="events_title">Today\'s events</string>
+    <string name="event_chore">Clean washroom</string>
+    <string name="event_bill">Water bill due today</string>
+    <string name="event_appointment">Vet appointment, 9:00 AM</string>
+    <string name="pet_title">Pet status</string>
+    <string name="pet_status">Status: Happy</string>
+    <string name="pet_walked">Walked</string>
+    <string name="pet_fed">Fed</string>
+    <string name="pet_done">Done</string>
+    <string name="feature_dashboard">Dashboard, current screen</string>
+    <string name="feature_chores">Chores</string>
+    <string name="feature_groceries">Groceries</string>
+    <string name="feature_pet_care">Pet Care</string>
+    <string name="feature_expenses">Expenses</string>
 </resources>

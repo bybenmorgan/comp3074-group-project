@@ -2,4 +2,15 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="dashboard_cream">#F5F3E8</color>
+    <color name="dashboard_background">#DEE4C8</color>
+    <color name="dashboard_sage">#AFBFA8</color>
+    <color name="dashboard_muted_green">#99A38F</color>
+    <color name="dashboard_text">#273027</color>
+    <color name="dashboard_text_secondary">#303A2E</color>
+    <color name="dashboard_outline">#6B7866</color>
+    <color name="dashboard_blush">#E2D5D5</color>
+    <color name="dashboard_taupe">#C5BDB1</color>
+    <color name="dashboard_yellow">#E8DEB6</color>
+    <color name="dashboard_lavender">#E3DFF2</color>
 </resources>
