@@ -21,4 +21,25 @@
     <string name="feature_groceries">Groceries</string>
     <string name="feature_pet_care">Pet Care</string>
     <string name="feature_expenses">Expenses</string>
+    <string name="return_to_dashboard">Return to Dashboard</string>
+    <string name="feature_expenses_current">Expenses, current screen</string>
+    <string name="expenses_title">Expenses &amp; Finances</string>
+    <string name="expenses_you_owe">You owe</string>
+    <string name="expenses_balance">$42.50</string>
+    <string name="expenses_add">Add Expense</string>
+    <string name="expenses_recent">Recent Expenses</string>
+    <string name="expense_internet">Internet</string>
+    <string name="expense_internet_amount">$80.00</string>
+    <string name="expense_internet_date">Oct. 28</string>
+    <string name="expense_groceries">Groceries</string>
+    <string name="expense_groceries_amount">$34.17</string>
+    <string name="expense_groceries_date">Oct. 27</string>
+    <string name="expense_rent">Rent</string>
+    <string name="expense_rent_amount">$1800.00</string>
+    <string name="expense_rent_date">Oct. 25</string>
+    <string name="expense_pet_supplies">Pet Supplies</string>
+    <string name="expense_pet_supplies_amount">$60.00</string>
+    <string name="expense_pet_supplies_date">Oct. 20</string>
+    <string name="expense_paid_by_ben">Paid by Ben</string>
+    <string name="expense_paid_by_hannah">Paid by Hannah</string>
 </resources>
