@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">COMP3074 Group Project</string>
     <string name="dashboard_title">Household Manager</string>
+    <string name="household_setup_title">Set Up Your Household</string>
+    <string name="household_setup_intro">Create a household or join your roommates to start managing your home together.</string>
+    <string name="create_household">Create Household</string>
+    <string name="household_name">Household name</string>
+    <string name="household_name_required">Enter a household name.</string>
+    <string name="household_setup_or">OR</string>
+    <string name="join_household">Join Household</string>
+    <string name="invite_code">Invite code</string>
+    <string name="invite_code_helper">Ask a roommate for your household invite code.</string>
+    <string name="invite_code_required">Enter an invite code.</string>
     <string name="profile_placeholder">Household profile placeholder</string>
     <string name="noticeboard_title">Noticeboard</string>
     <string name="notice_groceries">Need carrots</string>
