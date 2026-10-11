@@ -20,6 +20,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".CreateJoinHouseholdActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

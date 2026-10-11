@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">COMP3074 Group Project</string>
     <string name="dashboard_title">Household Manager</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="email_required">Enter an email.</string>
+    <string name="password_required">Enter a password.</string>
+    <string name="new_here_create_account">New here? Create Account</string>
     <string name="household_setup_title">Set Up Your Household</string>
     <string name="household_setup_intro">Create a household or join your roommates to start managing your home together.</string>
     <string name="create_household">Create Household</string>
