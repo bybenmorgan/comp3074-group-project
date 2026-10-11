@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_status_row"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:layout_marginTop="8dp"
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/grocery_check"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@string/feature_groceries"
+        android:src="@drawable/ic_checkbox" />
+
+    <TextView
+        android:id="@+id/grocery_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.Household.Body" />
+
+    <TextView
+        android:id="@+id/grocery_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_check"
+        android:drawablePadding="4dp"
+        android:text="@string/pet_done"
+        android:textAppearance="@style/TextAppearance.Household.Caption"
+        android:visibility="gone" />
+</LinearLayout>

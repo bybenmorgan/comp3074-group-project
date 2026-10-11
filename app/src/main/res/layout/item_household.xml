@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/bg_status_row"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/household_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.Household.Body"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/household_current"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_today_chip"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="@string/household_current"
+            android:textAppearance="@style/TextAppearance.Household.Caption"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/household_pet_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="48dp"
+        android:text="@string/household_include_pet"
+        android:textAppearance="@style/TextAppearance.Household.Caption"
+        android:textColor="@color/dashboard_text" />
+
+    <TextView
+        android:id="@+id/household_pet_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textAppearance="@style/TextAppearance.Household.Caption" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/household_remove"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="48dp"
+        android:text="@string/household_remove"
+        android:textAppearance="@style/TextAppearance.Household.Body"
+        android:textColor="@color/dashboard_text"
+        app:backgroundTint="@color/dashboard_cream"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/dashboard_outline"
+        app:strokeWidth="1dp" />
+</LinearLayout>

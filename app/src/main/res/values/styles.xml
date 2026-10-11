@@ -45,6 +45,14 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="ThemeOverlay.Household.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/dashboard_outline</item>
+        <item name="colorOnPrimary">@color/dashboard_cream</item>
+        <item name="colorSurface">@color/dashboard_cream</item>
+        <item name="colorOnSurface">@color/dashboard_text</item>
+        <item name="android:background">@color/dashboard_cream</item>
+    </style>
+
     <style name="Widget.Household.ListItem" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
+
+    <EditText
+        android:id="@+id/appointment_title_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_status_row"
+        android:hint="@string/pet_appointment_title_hint"
+        android:importantForAutofill="no"
+        android:inputType="textCapSentences"
+        android:minHeight="52dp"
+        android:padding="12dp"
+        android:textAppearance="@style/TextAppearance.Household.Body"
+        android:textColor="@color/dashboard_text"
+        android:textColorHint="@color/dashboard_text_secondary" />
+
+    <EditText
+        android:id="@+id/appointment_date_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_status_row"
+        android:hint="@string/pet_appointment_date_hint"
+        android:importantForAutofill="no"
+        android:inputType="textCapWords"
+        android:minHeight="52dp"
+        android:padding="12dp"
+        android:textAppearance="@style/TextAppearance.Household.Body"
+        android:textColor="@color/dashboard_text"
+        android:textColorHint="@color/dashboard_text_secondary" />
+
+    <EditText
+        android:id="@+id/appointment_time_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_status_row"
+        android:hint="@string/pet_appointment_time_hint"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="52dp"
+        android:padding="12dp"
+        android:textAppearance="@style/TextAppearance.Household.Body"
+        android:textColor="@color/dashboard_text"
+        android:textColorHint="@color/dashboard_text_secondary" />
+</LinearLayout>

@@ -12,6 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.COMP3074GroupProject">
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".GroceriesActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".PetActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ChoresActivity"
+            android:exported="false" />
+        <activity
             android:name=".ExpensesActivity"
             android:exported="false" />
         <activity
