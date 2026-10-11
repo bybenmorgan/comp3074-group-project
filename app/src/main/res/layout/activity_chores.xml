@@ -48,9 +48,12 @@
                         android:textStyle="normal" />
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/open_settings"
                         style="@style/Widget.Household.Card"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardBackgroundColor="@color/dashboard_lavender"
                         app:cardCornerRadius="24dp">
 

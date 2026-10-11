@@ -27,6 +27,12 @@ class PetActivity : AppCompatActivity() {
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_pet)
+        if (!store.currentHousehold().hasPet) {
+            finish()
+            return
+        }
+        bindHouseholdChrome(store)
+        findViewById<TextView>(R.id.pet_name_label).text = store.currentHousehold().petName
         findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))

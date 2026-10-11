@@ -28,6 +28,7 @@ class GroceriesActivity : AppCompatActivity() {
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_groceries)
+        bindHouseholdChrome(store)
         findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))
@@ -48,6 +49,12 @@ class GroceriesActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bindHouseholdChrome(store)
+        renderList()
     }
 
     private fun showAddItemDialog() {

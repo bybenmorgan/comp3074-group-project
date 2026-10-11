@@ -48,9 +48,12 @@
                         android:textStyle="normal" />
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/open_settings"
                         style="@style/Widget.Household.Card"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardBackgroundColor="@color/dashboard_lavender"
                         app:cardCornerRadius="24dp">
 
@@ -252,6 +255,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/pet_status_card"
                         style="@style/Widget.Household.Card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

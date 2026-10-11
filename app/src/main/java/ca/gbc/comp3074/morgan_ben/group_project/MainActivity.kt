@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_main)
+        bindHouseholdChrome(store)
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))
         }
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        bindHouseholdChrome(store)
         bindDashboard()
     }
 
@@ -61,8 +63,9 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.notice_maintenance)
         }
 
+        val household = store.currentHousehold()
         val openChores = store.chores().filter { !it.done }.map { it.title }
-        val nextAppointment = store.appointments().firstOrNull()
+        val nextAppointment = if (household.hasPet) store.appointments().firstOrNull() else null
         findViewById<TextView>(R.id.event_one).text =
             openChores.getOrNull(0) ?: getString(R.string.event_no_chores)
         findViewById<TextView>(R.id.event_two).text =
@@ -70,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.event_three).text = if (nextAppointment != null) {
             "${nextAppointment.title}, ${nextAppointment.time}"
         } else {
-            getString(R.string.event_appointment)
+            getString(R.string.event_bill)
         }
 
         bindPetStatus(

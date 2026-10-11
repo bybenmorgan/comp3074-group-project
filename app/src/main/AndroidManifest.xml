@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.COMP3074GroupProject">
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".GroceriesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">COMP3074 Group Project</string>
     <string name="dashboard_title">Household Manager</string>
-    <string name="profile_placeholder">Household profile placeholder</string>
+    <string name="profile_placeholder">Open settings</string>
     <string name="noticeboard_title">Noticeboard</string>
     <string name="notice_groceries">Need carrots</string>
     <string name="notice_maintenance">Maintenance coming to fix the stove</string>
@@ -127,4 +127,18 @@
     <string name="grocery_eggs">Eggs</string>
     <string name="grocery_bread">Bread</string>
     <string name="grocery_dog_food">Dog food</string>
+    <string name="settings_title">Settings</string>
+    <string name="household_default_name">Home</string>
+    <string name="household_current_label">Current household</string>
+    <string name="household_current">Current</string>
+    <string name="households_list">Households</string>
+    <string name="household_add">Add Household</string>
+    <string name="household_remove">Remove</string>
+    <string name="household_remove_confirm">Remove %1$s?</string>
+    <string name="household_keep_one">Keep at least one household.</string>
+    <string name="household_name_hint">Household name</string>
+    <string name="household_include_pet">Include a pet</string>
+    <string name="household_pet_name_hint">Pet name</string>
+    <string name="household_pet_is">Pet: %1$s</string>
+    <string name="household_no_pet">No pet in this household</string>
 </resources>
