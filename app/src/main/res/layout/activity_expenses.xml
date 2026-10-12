@@ -48,9 +48,12 @@
                         android:textStyle="normal" />
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/open_settings"
                         style="@style/Widget.Household.Card"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardBackgroundColor="@color/dashboard_lavender"
                         app:cardCornerRadius="24dp">
 
@@ -100,6 +103,7 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:id="@+id/expenses_owe_label"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/expenses_you_owe"
@@ -107,6 +111,7 @@
                                 android:textSize="20sp" />
 
                             <TextView
+                                android:id="@+id/expenses_balance"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
@@ -116,11 +121,11 @@
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
                             android:contentDescription="@null"
                             android:importantForAccessibility="no"
-                            app:srcCompat="@drawable/ic_expenses" />
+                            app:srcCompat="@drawable/ic_coins" />
                     </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
@@ -128,7 +133,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:clickable="false"
                         android:minHeight="56dp"
                         android:text="@string/expenses_add"
                         android:textAppearance="@style/TextAppearance.Household.Heading"
@@ -161,7 +165,9 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/feature_dashboard"
                         style="@style/Widget.Household.FeatureButton"
+                        android:clickable="true"
                         android:contentDescription="@string/return_to_dashboard"
+                        android:focusable="true"
                         app:backgroundTint="@color/dashboard_cream"
                         app:icon="@drawable/ic_dashboard" />
 
@@ -169,7 +175,9 @@
                         android:id="@+id/feature_chores"
                         style="@style/Widget.Household.FeatureButton"
                         android:layout_marginTop="16dp"
+                        android:clickable="true"
                         android:contentDescription="@string/feature_chores"
+                        android:focusable="true"
                         app:backgroundTint="@color/dashboard_muted_green"
                         app:icon="@drawable/ic_chores" />
 
@@ -177,7 +185,9 @@
                         android:id="@+id/feature_groceries"
                         style="@style/Widget.Household.FeatureButton"
                         android:layout_marginTop="16dp"
+                        android:clickable="true"
                         android:contentDescription="@string/feature_groceries"
+                        android:focusable="true"
                         app:backgroundTint="@color/dashboard_blush"
                         app:icon="@drawable/ic_groceries" />
 
@@ -185,7 +195,9 @@
                         android:id="@+id/feature_pet_care"
                         style="@style/Widget.Household.FeatureButton"
                         android:layout_marginTop="16dp"
+                        android:clickable="true"
                         android:contentDescription="@string/feature_pet_care"
+                        android:focusable="true"
                         app:backgroundTint="@color/dashboard_taupe"
                         app:icon="@drawable/ic_pet" />
 
@@ -216,198 +228,27 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:accessibilityHeading="true"
-                            android:background="@drawable/bg_status_row"
+                            android:background="@drawable/bg_title_bar"
+                            android:gravity="center"
                             android:padding="12dp"
                             android:text="@string/expenses_recent"
                             android:textAppearance="@style/TextAppearance.Household.Heading" />
 
                         <LinearLayout
+                            android:id="@+id/expense_list"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_status_row"
                             android:orientation="vertical"
-                            android:padding="10dp">
+                            android:paddingTop="8dp" />
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/ic_internet"
-                                android:drawablePadding="8dp"
-                                android:gravity="center_vertical"
-                                android:text="@string/expense_internet"
-                                android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_weight="1"
-                                    android:text="@string/expense_internet_amount"
-                                    android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/expense_internet_date"
-                                    android:textAppearance="@style/TextAppearance.Household.Caption" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/expense_paid_by_ben"
-                                android:textAppearance="@style/TextAppearance.Household.Caption" />
-                        </LinearLayout>
-
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/expense_empty"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_status_row"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/ic_groceries"
-                                android:drawablePadding="8dp"
-                                android:gravity="center_vertical"
-                                android:text="@string/expense_groceries"
-                                android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_weight="1"
-                                    android:text="@string/expense_groceries_amount"
-                                    android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/expense_groceries_date"
-                                    android:textAppearance="@style/TextAppearance.Household.Caption" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/expense_paid_by_hannah"
-                                android:textAppearance="@style/TextAppearance.Household.Caption" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_status_row"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/ic_rent"
-                                android:drawablePadding="8dp"
-                                android:gravity="center_vertical"
-                                android:text="@string/expense_rent"
-                                android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_weight="1"
-                                    android:text="@string/expense_rent_amount"
-                                    android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/expense_rent_date"
-                                    android:textAppearance="@style/TextAppearance.Household.Caption" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/expense_paid_by_hannah"
-                                android:textAppearance="@style/TextAppearance.Household.Caption" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:background="@drawable/bg_status_row"
-                            android:orientation="vertical"
-                            android:padding="10dp">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:drawableStart="@drawable/ic_pet"
-                                android:drawablePadding="8dp"
-                                android:gravity="center_vertical"
-                                android:text="@string/expense_pet_supplies"
-                                android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="4dp"
-                                    android:layout_weight="1"
-                                    android:text="@string/expense_pet_supplies_amount"
-                                    android:textAppearance="@style/TextAppearance.Household.Body" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/expense_pet_supplies_date"
-                                    android:textAppearance="@style/TextAppearance.Household.Caption" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/expense_paid_by_ben"
-                                android:textAppearance="@style/TextAppearance.Household.Caption" />
-                        </LinearLayout>
+                            android:padding="12dp"
+                            android:text="@string/expenses_empty"
+                            android:textAppearance="@style/TextAppearance.Household.Caption"
+                            android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
