@@ -14,12 +14,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
     private val store by lazy { HouseholdRepository(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireSignedIn()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
@@ -28,12 +30,21 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         bindHouseholdChrome(store)
         findViewById<MaterialButton>(R.id.add_household).setOnClickListener { showAddDialog() }
+        findViewById<MaterialButton>(R.id.logout).setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            openLogin()
+        }
         renderList()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings_main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isFinishing) requireSignedIn()
     }
 
     private fun showAddDialog() {

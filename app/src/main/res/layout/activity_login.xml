@@ -83,6 +83,7 @@
                         android:padding="16dp">
 
                         <TextView
+                            android:id="@+id/account_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:accessibilityHeading="true"
@@ -136,6 +137,52 @@
                                 android:saveEnabled="false"
                                 android:textAppearance="@style/TextAppearance.Household.Body" />
                         </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/confirm_password_layout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:hint="@string/confirm_password"
+                            android:visibility="gone"
+                            app:boxBackgroundColor="@color/dashboard_cream"
+                            app:boxCornerRadiusBottomEnd="16dp"
+                            app:boxCornerRadiusBottomStart="16dp"
+                            app:boxCornerRadiusTopEnd="16dp"
+                            app:boxCornerRadiusTopStart="16dp"
+                            app:endIconMode="password_toggle">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/confirm_password"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:inputType="textPassword"
+                                android:maxLines="1"
+                                android:saveEnabled="false"
+                                android:textAppearance="@style/TextAppearance.Household.Body" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <ProgressBar
+                            android:id="@+id/auth_progress"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="16dp"
+                            android:importantForAccessibility="no"
+                            android:indeterminateTint="@color/dashboard_outline"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/auth_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:accessibilityLiveRegion="polite"
+                            android:textAppearance="@style/TextAppearance.Household.Body"
+                            android:visibility="gone" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/login"

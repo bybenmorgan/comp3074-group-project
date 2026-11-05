@@ -89,6 +89,18 @@
                         android:text="@string/settings_title"
                         android:textAppearance="@style/TextAppearance.Household.Heading" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/logout"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginEnd="16dp"
+                        android:minHeight="48dp"
+                        android:text="@string/logout"
+                        android:textAppearance="@style/TextAppearance.Household.Body"
+                        android:textColor="@color/dashboard_text" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

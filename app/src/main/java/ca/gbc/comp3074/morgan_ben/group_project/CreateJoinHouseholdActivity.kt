@@ -14,6 +14,7 @@ import com.google.android.material.textfield.TextInputLayout
 class CreateJoinHouseholdActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireSignedIn()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
@@ -51,7 +52,13 @@ class CreateJoinHouseholdActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (!isFinishing) requireSignedIn()
+    }
+
     private fun openDashboard() {
+        if (!requireSignedIn()) return
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
