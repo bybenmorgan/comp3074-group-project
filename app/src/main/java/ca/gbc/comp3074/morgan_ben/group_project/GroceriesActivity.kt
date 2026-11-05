@@ -22,12 +22,14 @@ class GroceriesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_groceries)
+        watchAccount()
         bindHouseholdChrome(store)
         findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
@@ -53,6 +55,7 @@ class GroceriesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!requireHousehold()) return
         bindHouseholdChrome(store)
         renderList()
     }

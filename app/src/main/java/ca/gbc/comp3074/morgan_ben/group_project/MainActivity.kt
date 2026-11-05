@@ -15,13 +15,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!requireSignedIn()) return
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_main)
+        watchAccount()
         bindHouseholdChrome(store)
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (isFinishing || !requireSignedIn()) return
+        if (!requireHousehold()) return
         bindHouseholdChrome(store)
         bindDashboard()
     }

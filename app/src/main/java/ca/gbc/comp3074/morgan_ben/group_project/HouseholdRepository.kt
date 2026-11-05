@@ -2,6 +2,7 @@ package ca.gbc.comp3074.morgan_ben.group_project
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,18 +32,9 @@ data class AppointmentItem(
     val time: String
 )
 
-data class Household(
-    val id: String,
-    val name: String,
-    val hasPet: Boolean,
-    val petName: String
-)
-
 class HouseholdRepository(context: Context) {
     private val app = context.applicationContext
 
-    private val settingsPrefs: SharedPreferences
-        get() = app.getSharedPreferences(SETTINGS_PREFS, Context.MODE_PRIVATE)
     private val choresPrefs: SharedPreferences
         get() = scopedPrefs(CHORES_PREFS)
     private val expensePrefs: SharedPreferences
@@ -52,102 +44,13 @@ class HouseholdRepository(context: Context) {
     private val petPrefs: SharedPreferences
         get() = scopedPrefs(PET_PREFS)
 
-    fun households(): List<Household> {
-        ensureDefaultHousehold()
-        return ids().map { loadHousehold(it) }
-    }
+    fun currentHousehold(): Household = checkNotNull(HouseholdSession.current()?.active)
 
-    fun currentHousehold(): Household {
-        ensureDefaultHousehold()
-        return loadHousehold(currentId())
-    }
-
-    fun setActiveHousehold(id: String) {
-        if (ids().contains(id)) {
-            settingsPrefs.edit().putString(KEY_ACTIVE, id).apply()
-        }
-    }
-
-    fun addHousehold(name: String, hasPet: Boolean, petName: String): Household {
-        ensureDefaultHousehold()
-        val household = Household(
-            id = "hh_${System.currentTimeMillis()}",
-            name = name,
-            hasPet = hasPet,
-            petName = petName
-        )
-        saveHousehold(household)
-        settingsPrefs.edit()
-            .putString(KEY_IDS, (ids() + household.id).joinToString(","))
-            .putString(KEY_ACTIVE, household.id)
-            .apply()
-        return household
-    }
-
-    fun updateHousehold(household: Household) {
-        saveHousehold(household)
-    }
-
-    fun removeHousehold(id: String): Boolean {
-        val remaining = ids().filter { it != id }
-        if (remaining.isEmpty()) return false
-        settingsPrefs.edit()
-            .putString(KEY_IDS, remaining.joinToString(","))
-            .putString(KEY_ACTIVE, if (currentId() == id) remaining.first() else currentId())
-            .remove(nameKey(id))
-            .remove(petKey(id))
-            .remove(petNameKey(id))
-            .apply()
-        return true
-    }
-
-    private fun ensureDefaultHousehold() {
-        if (ids().isNotEmpty()) return
-        val household = Household(
-            DEFAULT_ID,
-            app.getString(R.string.household_default_name),
-            true,
-            app.getString(R.string.pet_name)
-        )
-        settingsPrefs.edit()
-            .putString(KEY_IDS, household.id)
-            .putString(KEY_ACTIVE, household.id)
-            .apply()
-        saveHousehold(household)
-    }
-
-    private fun ids(): List<String> =
-        settingsPrefs.getString(KEY_IDS, "")
-            .orEmpty()
-            .split(",")
-            .filter { it.isNotBlank() }
-
-    private fun currentId(): String {
-        ensureDefaultHousehold()
-        val active = settingsPrefs.getString(KEY_ACTIVE, DEFAULT_ID) ?: DEFAULT_ID
-        return if (ids().contains(active)) active else ids().first()
-    }
-
-    private fun loadHousehold(id: String): Household = Household(
-        id = id,
-        name = settingsPrefs.getString(nameKey(id), app.getString(R.string.household_default_name))
-            ?: app.getString(R.string.household_default_name),
-        hasPet = settingsPrefs.getBoolean(petKey(id), true),
-        petName = settingsPrefs.getString(petNameKey(id), app.getString(R.string.pet_name))
-            ?: app.getString(R.string.pet_name)
-    )
-
-    private fun saveHousehold(household: Household) {
-        settingsPrefs.edit()
-            .putString(nameKey(household.id), household.name)
-            .putBoolean(petKey(household.id), household.hasPet)
-            .putString(petNameKey(household.id), household.petName)
-            .apply()
-    }
+    private fun currentId(): String = currentHousehold().id
 
     private fun scopedPrefs(base: String): SharedPreferences {
-        val id = currentId()
-        val name = if (id == DEFAULT_ID) base else "${base}_$id"
+        val uid = checkNotNull(FirebaseAuth.getInstance().currentUser?.uid)
+        val name = "${base}_${uid}_${currentId()}"
         return app.getSharedPreferences(name, Context.MODE_PRIVATE)
     }
 
@@ -315,9 +218,6 @@ class HouseholdRepository(context: Context) {
         const val PET_DINNER = "dinner"
 
         private const val DEFAULT_ID = "home"
-        private const val SETTINGS_PREFS = "households"
-        private const val KEY_IDS = "ids"
-        private const val KEY_ACTIVE = "active"
         private const val CHORES_PREFS = "chores"
         private const val EXPENSE_PREFS = "expenses"
         private const val GROCERY_PREFS = "groceries"
@@ -326,10 +226,6 @@ class HouseholdRepository(context: Context) {
         private const val KEY_EXPENSES = "items"
         private const val KEY_GROCERIES = "items"
         private const val KEY_APPOINTMENTS = "appointments"
-
-        private fun nameKey(id: String) = "name_$id"
-        private fun petKey(id: String) = "pet_$id"
-        private fun petNameKey(id: String) = "pet_name_$id"
 
         fun todayLong(): String = SimpleDateFormat("MMMM d, yyyy", Locale.US).format(Date())
 

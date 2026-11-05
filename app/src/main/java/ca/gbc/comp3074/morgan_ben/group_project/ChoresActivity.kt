@@ -22,12 +22,14 @@ class ChoresActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_chores)
+        watchAccount()
         bindHouseholdChrome(store)
         findViewById<TextView>(R.id.chores_today_date).text = HouseholdRepository.todayLong()
         findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
@@ -54,6 +56,7 @@ class ChoresActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!requireHousehold()) return
         bindHouseholdChrome(store)
         renderList()
     }

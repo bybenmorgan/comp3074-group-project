@@ -89,6 +89,7 @@
                         android:text="@string/settings_title"
                         android:textAppearance="@style/TextAppearance.Household.Heading" />
 
+                    <include layout="@layout/household_request_status" />
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/logout"
                         style="@style/Widget.Material3.Button.TextButton"
@@ -122,6 +123,24 @@
                             android:layout_marginTop="4dp"
                             android:textAppearance="@style/TextAppearance.Household.Heading"
                             android:textSize="28sp" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/invite_code"
+                            android:textAppearance="@style/TextAppearance.Household.Body" />
+                        <TextView
+                            android:id="@+id/household_invite_code"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textIsSelectable="true"
+                            android:textAppearance="@style/TextAppearance.Household.Body" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/copy_invite_code"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/household_copy_code" />
                     </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
@@ -141,6 +160,13 @@
                         app:iconTint="@null"
                         app:strokeColor="@color/dashboard_outline"
                         app:strokeWidth="1dp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settings_join_household"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:text="@string/join_household" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

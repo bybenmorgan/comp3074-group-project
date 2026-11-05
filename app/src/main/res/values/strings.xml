@@ -1,4 +1,20 @@
 <resources>
+    <string name="household_loading">Loading your households…</string>
+    <string name="household_empty">You haven’t joined a household yet. Create one or enter an invite code.</string>
+    <string name="household_refresh">Refresh households</string>
+    <string name="household_name_invalid">Enter a household name between 1 and 80 characters.</string>
+    <string name="household_pet_name_invalid">Use up to 80 characters for the pet name.</string>
+    <string name="household_code_invalid">Enter the full 20-character invite code. Codes are case-sensitive.</string>
+    <string name="household_code_not_found">Couldn’t join with that code. Check it with a household member. If it is correct, Firestore rules may need publishing.</string>
+    <string name="household_network_error">Can’t reach Firestore. Check your connection and try again.</string>
+    <string name="household_permission_error">Firestore denied this request. Refresh your membership or check that the household rules are published.</string>
+    <string name="household_setup_error">Firestore isn’t ready. Check that the default database has been created.</string>
+    <string name="household_request_error">Couldn’t load or save your households. Check your connection and Firestore setup, then try again.</string>
+    <string name="household_saved_refresh">Your change was saved, but the household list couldn’t refresh. Refresh before making another change.</string>
+    <string name="household_leave">Leave household</string>
+    <string name="household_leave_confirm">Leave %1$s? Other members and household data will stay. If this is your last household, you’ll return to setup.</string>
+    <string name="household_copy_code">Copy invite code</string>
+    <string name="household_code_copied">Invite code copied</string>
     <string name="app_name">COMP3074 Group Project</string>
     <string name="dashboard_title">Household Manager</string>
     <string name="login">Login</string>

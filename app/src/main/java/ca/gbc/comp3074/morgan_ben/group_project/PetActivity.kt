@@ -18,19 +18,23 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class PetActivity : AppCompatActivity() {
     private val store by lazy { HouseholdRepository(this) }
+    private var renderedHousehold: Household? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_pet)
+        watchAccount()
         if (!store.currentHousehold().hasPet) {
             finish()
             return
         }
+        renderedHousehold = store.currentHousehold()
         bindHouseholdChrome(store)
         findViewById<TextView>(R.id.pet_name_label).text = store.currentHousehold().petName
         findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
@@ -79,6 +83,14 @@ class PetActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!requireHousehold()) return
+        val current = store.currentHousehold()
+        if (!current.hasPet) finish()
+        else if (current != renderedHousehold) recreate()
     }
 
     private fun bindTask(rowId: Int, key: String, title: String, subtitle: String) {

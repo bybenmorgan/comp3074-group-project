@@ -55,6 +55,14 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/household_setup_intro"
                     android:textAppearance="@style/TextAppearance.Household.Body" />
+                <include layout="@layout/household_request_status" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/household_logout"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:text="@string/logout" />
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.Household.Card"
                     android:layout_width="match_parent"

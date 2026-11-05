@@ -175,23 +175,21 @@ class LoginActivity : AppCompatActivity() {
             if (!task.isComplete) return
             request.task = null
             if (task.isSuccessful && auth.currentUser != null) {
-                openAccountScreen(request.registering)
+                openAccountScreen()
             } else {
                 errorMessage = authenticationError(task.exception)
                 renderForm()
             }
         } else if (auth.currentUser != null) {
-            openAccountScreen(false)
+            openAccountScreen()
         }
     }
 
-    private fun openAccountScreen(newAccount: Boolean) {
+    private fun openAccountScreen() {
         navigating = true
         password.text?.clear()
         confirmation.text?.clear()
-        val destination = if (newAccount) CreateJoinHouseholdActivity::class.java
-        else MainActivity::class.java
-        startActivity(Intent(this, destination).apply {
+        startActivity(Intent(this, CreateJoinHouseholdActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
         finish()
