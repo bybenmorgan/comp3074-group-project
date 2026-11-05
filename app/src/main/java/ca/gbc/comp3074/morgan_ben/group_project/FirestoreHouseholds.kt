@@ -21,18 +21,46 @@ class FirestoreHouseholds(private val uid: String) {
                 list.exception ?: selection.exception ?: it.exception!!
             )
             val joined = list.result.documents.map { doc ->
-                Household(
+                loadMembers(Household(
                     doc.id, doc.getString("name").orEmpty(),
                     doc.getBoolean("hasPet") ?: false, doc.getString("petName").orEmpty(),
                     (doc.get("memberUids") as? List<*>)?.filterIsInstance<String>().orEmpty()
-                )
+                ))
             }
             val savedId = selection.result.getString("activeHouseholdId")
-            val result = resolveMembership(uid, joined, savedId)
-            if (savedId == result.activeId) Tasks.forResult(result)
-            else select(result.activeId).continueWith { saved ->
-                if (!saved.isSuccessful) throw saved.exception!!
-                result
+            Tasks.whenAll(joined).continueWithTask membersLoaded@ { loaded ->
+                if (!loaded.isSuccessful) return@membersLoaded Tasks.forException(
+                    joined.firstOrNull { !it.isSuccessful }?.exception ?: loaded.exception!!
+                )
+                val result = resolveMembership(uid, joined.map { it.result }, savedId)
+                if (savedId == result.activeId) Tasks.forResult(result)
+                else select(result.activeId).continueWith { saved ->
+                    if (!saved.isSuccessful) throw saved.exception!!
+                    result
+                }
+            }
+        }
+    }
+
+    private fun loadMembers(household: Household): Task<Household> {
+        val members = households.document(household.id).collection("members")
+        return members.get(Source.SERVER).continueWithTask { loaded ->
+            if (!loaded.isSuccessful) return@continueWithTask Tasks.forException(loaded.exception!!)
+            val labels = loaded.result.documents.mapNotNull { doc ->
+                (doc.get("label") as? String)?.let { doc.id to it }
+            }.toMap()
+            if (loaded.result.documents.any { it.id == uid }) {
+                Tasks.forResult(household.copy(memberLabels = labels))
+            } else db.runTransaction { transaction ->
+                checkAccount()
+                val own = members.document(uid)
+                val record = transaction.get(own)
+                val label = if (record.exists()) record.get("label") as? String else {
+                    val email = memberLabel()
+                    transaction.set(own, mapOf("label" to email))
+                    email
+                }
+                household.copy(memberLabels = labels + (uid to label.orEmpty()))
             }
         }
     }
@@ -49,6 +77,7 @@ class FirestoreHouseholds(private val uid: String) {
                 "memberUids" to listOf(uid)
             ))
             transaction.set(account, mapOf("activeHouseholdId" to household.id), SetOptions.merge())
+            transaction.set(household.collection("members").document(uid), mapOf("label" to memberLabel()))
             Unit
         }
     }
@@ -61,6 +90,8 @@ class FirestoreHouseholds(private val uid: String) {
             transaction.get(account)
             transaction.update(households.document(code), "memberUids", FieldValue.arrayUnion(uid))
             transaction.set(account, mapOf("activeHouseholdId" to code), SetOptions.merge())
+            transaction.set(households.document(code).collection("members").document(uid),
+                mapOf("label" to memberLabel()))
             Unit
         }
     }
@@ -93,6 +124,11 @@ class FirestoreHouseholds(private val uid: String) {
             transaction.update(households.document(id), mapOf("hasPet" to hasPet, "petName" to petName))
             Unit
         }
+    }
+
+    private fun memberLabel(): String {
+        checkAccount()
+        return checkNotNull(FirebaseAuth.getInstance().currentUser?.email)
     }
 
     private fun checkAccount() {

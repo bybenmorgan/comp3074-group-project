@@ -56,4 +56,24 @@ class HouseholdMembershipTest {
         assertNull(result.active)
         assertTrue(result.households.isEmpty())
     }
+
+    @Test fun memberLabelsFollowCurrentUidsAndIgnoreLeftoverRecords() {
+        val home = household("home", "alice", "bob").copy(memberLabels = mapOf(
+            "alice" to "alice@example.com", "bob" to "bob@example.com", "left" to "left@example.com"
+        ))
+        assertEquals(listOf(
+            HouseholdMember("alice", "alice@example.com"), HouseholdMember("bob", "bob@example.com")
+        ), home.members)
+        assertEquals(listOf(HouseholdMember("bob", "bob@example.com")),
+            home.copy(memberUids = listOf("bob")).members)
+    }
+
+    @Test fun missingOrBlankLabelsFallBackToIdentity() {
+        val home = household("home", "alice", "bob", "eve").copy(
+            memberLabels = mapOf("bob" to "", "eve" to "  ")
+        )
+        assertEquals(listOf(
+            HouseholdMember("alice", "alice"), HouseholdMember("bob", "bob"), HouseholdMember("eve", "eve")
+        ), home.members)
+    }
 }

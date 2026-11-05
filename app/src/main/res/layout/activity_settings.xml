@@ -141,6 +141,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/household_copy_code" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:accessibilityHeading="true"
+                            android:text="@string/household_members"
+                            android:textAppearance="@style/TextAppearance.Household.Heading"
+                            android:textSize="20sp" />
+                        <TextView
+                            android:id="@+id/household_members"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.Household.Body" />
                     </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton

@@ -136,6 +136,8 @@ class SettingsActivity : AppCompatActivity() {
         }
         findViewById<TextView>(R.id.current_household_name).text = membership?.active?.name.orEmpty()
         findViewById<TextView>(R.id.household_invite_code).text = membership?.active?.id.orEmpty()
+        findViewById<TextView>(R.id.household_members).text =
+            membership?.active?.members.orEmpty().joinToString("\n") { it.label }
         val list = findViewById<LinearLayout>(R.id.household_list)
         list.removeAllViews()
         membership?.households.orEmpty().forEach { household ->

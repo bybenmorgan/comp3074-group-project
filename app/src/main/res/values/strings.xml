@@ -183,6 +183,7 @@
     <string name="household_current_label">Current household</string>
     <string name="household_current">Current</string>
     <string name="households_list">Households</string>
+    <string name="household_members">Members</string>
     <string name="household_add">Add Household</string>
     <string name="household_remove">Remove</string>
     <string name="household_remove_confirm">Remove %1$s?</string>
