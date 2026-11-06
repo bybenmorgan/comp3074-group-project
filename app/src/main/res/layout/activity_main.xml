@@ -98,12 +98,12 @@
                         <TextView
                             android:id="@+id/notice_one"
                             style="@style/Widget.Household.ListItem"
-                            android:text="@string/notice_groceries" />
+                            android:text="@string/dashboard_no_groceries" />
 
                         <TextView
                             android:id="@+id/notice_two"
                             style="@style/Widget.Household.ListItem"
-                            android:text="@string/notice_maintenance" />
+                            android:visibility="gone" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -206,7 +206,7 @@
                                         android:id="@+id/events_day"
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="@string/events_day"
+                                        tools:text="@string/events_day"
                                         android:textAppearance="@style/TextAppearance.Household.Heading" />
 
                                     <TextView
@@ -214,7 +214,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="4dp"
                                         android:accessibilityHeading="true"
-                                        android:text="@string/events_title"
+                                        android:text="@string/dashboard_activity_title"
                                         android:textAppearance="@style/TextAppearance.Household.Caption" />
                                 </LinearLayout>
 
@@ -223,7 +223,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:gravity="center"
-                                    android:text="@string/events_date"
+                                    tools:text="@string/events_date"
                                     android:textAppearance="@style/TextAppearance.Household.Heading"
                                     android:textSize="20sp"
                                     android:textStyle="normal" />
@@ -239,18 +239,66 @@
                                 <TextView
                                     android:id="@+id/event_one"
                                     style="@style/Widget.Household.ListItem"
-                                    android:text="@string/event_chore" />
+                                    android:text="@string/event_no_chores" />
 
                                 <TextView
                                     android:id="@+id/event_two"
                                     style="@style/Widget.Household.ListItem"
-                                    android:text="@string/event_bill" />
+                                    android:visibility="gone" />
 
                                 <TextView
                                     android:id="@+id/event_three"
                                     style="@style/Widget.Household.ListItem"
-                                    android:text="@string/event_appointment" />
+                                    android:visibility="gone" />
                             </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/dashboard_expenses"
+                        style="@style/Widget.Household.Card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:accessibilityHeading="true"
+                                android:text="@string/feature_expenses"
+                                android:textAppearance="@style/TextAppearance.Household.Heading" />
+
+                            <TextView
+                                android:id="@+id/dashboard_expense_label"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:accessibilityLiveRegion="polite"
+                                android:text="@string/expense_loading"
+                                android:textAppearance="@style/TextAppearance.Household.Body" />
+
+                            <TextView
+                                android:id="@+id/dashboard_expense_balance"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/expense_balance_unknown"
+                                android:textAppearance="@style/TextAppearance.Household.Heading" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/dashboard_expense_retry"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/expense_retry"
+                                android:visibility="gone" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -285,7 +333,7 @@
                                 android:gravity="center_vertical"
                                 android:minHeight="48dp"
                                 android:padding="10dp"
-                                android:text="@string/pet_status"
+                                android:visibility="gone"
                                 android:textAppearance="@style/TextAppearance.Household.Body" />
 
                             <LinearLayout

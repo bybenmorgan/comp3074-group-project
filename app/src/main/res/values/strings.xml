@@ -17,6 +17,8 @@
     <string name="household_code_copied">Invite code copied</string>
     <string name="app_name">COMP3074 Group Project</string>
     <string name="dashboard_title">Household Manager</string>
+    <string name="dashboard_no_groceries">No grocery items yet</string>
+    <string name="dashboard_activity_title">Chores &amp; appointments</string>
     <string name="login">Login</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
