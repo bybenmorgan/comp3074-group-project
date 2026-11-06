@@ -68,8 +68,35 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      match /expenses/{expenseId} {
+        function validExpense() {
+          let data = request.resource.data;
+          let members = get(/databases/$(database)/documents/households/$(householdId)).data.memberUids;
+          let payer = /databases/$(database)/documents/households/$(householdId)/members/$(data.payerUid);
+          return data.keys().hasAll(['description', 'amountCents', 'payerUid', 'payerLabel',
+              'participantUids', 'creatorUid', 'date'])
+            && data.keys().hasOnly(['description', 'amountCents', 'payerUid', 'payerLabel',
+              'participantUids', 'creatorUid', 'date'])
+            && data.description is string && data.description.size() <= 120
+            && !data.description.matches('\\s*')
+            && data.amountCents is int && data.amountCents > 0 && data.amountCents <= 999999999
+            && data.payerUid is string && data.payerUid in members
+            && data.payerLabel is string && data.payerLabel.size() > 0 && data.payerLabel.size() <= 320
+            && data.payerLabel == (exists(payer) ? get(payer).data.label : data.payerUid)
+            && data.participantUids is list
+            && data.participantUids.size() == data.participantUids.toSet().size()
+            && data.participantUids.toSet() == members.toSet()
+            && data.creatorUid == request.auth.uid
+            && data.date is timestamp && data.date == request.time;
+        }
+
+        allow read: if member(householdId);
+        allow create: if member(householdId) && validExpense();
+        allow update, delete: if false;
+      }
+
       match /{collection}/{document=**} {
-        allow read, write: if collection != 'members' && member(householdId);
+        allow read, write: if !(collection in ['members', 'expenses']) && member(householdId);
       }
     }
   }

@@ -2,7 +2,8 @@ const { readFileSync } = require('node:fs');
 const { resolve } = require('node:path');
 const { initializeTestEnvironment, assertFails, assertSucceeds } = require('@firebase/rules-unit-testing');
 const { doc, setDoc, getDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove,
-  collection, getDocs, query, where, writeBatch, runTransaction } = require('firebase/firestore');
+  collection, getDocs, query, where, writeBatch, runTransaction, serverTimestamp,
+  Timestamp, orderBy } = require('firebase/firestore');
 const assert = require('node:assert/strict');
 
 // refuse to run unless emulators:exec provides a local Firestore endpoint
@@ -101,6 +102,59 @@ async function main() {
     await denied(updateDoc(home(bob), { hasPet: 'yes' }));
     await denied(deleteDoc(home(alice)));
 
+    const expense = (db, id = 'expense-1') => doc(db, `${path}/expenses/${id}`);
+    const expenseData = () => ({ description: 'Dinner', amountCents: 1001,
+      payerUid: 'bob', payerLabel: 'bob@example.com', participantUids: ['alice', 'bob'],
+      creatorUid: 'alice', date: serverTimestamp() });
+    await allowed(setDoc(expense(alice), expenseData()));
+    await allowed(getDoc(expense(bob)));
+    await allowed(getDocs(query(collection(alice, `${path}/expenses`), orderBy('date', 'desc'))));
+    await denied(getDoc(expense(eve)));
+    await denied(getDocs(collection(eve, `${path}/expenses`)));
+    await denied(getDoc(expense(guest)));
+    await denied(getDocs(collection(guest, `${path}/expenses`)));
+    await denied(setDoc(expense(eve, 'outsider'), { ...expenseData(), creatorUid: 'eve' }));
+    await denied(setDoc(expense(guest, 'guest'), expenseData()));
+    const invalidExpenses = [
+      { description: '' }, { description: ' \n\t' }, { description: 'x'.repeat(121) },
+      { description: 123 }, { amountCents: 0 }, { amountCents: -1 }, { amountCents: 1.5 },
+      { amountCents: '100' }, { amountCents: 1000000000 }, { payerUid: 'eve' },
+      { payerUid: null }, { payerLabel: '' }, { payerLabel: 4 }, { payerLabel: 'Forged' },
+      { payerLabel: 'x'.repeat(321) }, { creatorUid: 'bob' }, { creatorUid: null },
+      { participantUids: [] }, { participantUids: ['alice'] },
+      { participantUids: ['alice', 'bob', 'eve'] }, { participantUids: ['alice', 'bob', 'bob'] },
+      { participantUids: 'alice,bob' }, { participantUids: ['alice', 123] },
+      { date: Timestamp.fromMillis(1) }, { date: 'today' }, { date: null }, { extra: true }
+    ];
+    for (const [i, change] of invalidExpenses.entries()) {
+      await denied(setDoc(expense(alice, `invalid-${i}`), { ...expenseData(), ...change }));
+    }
+    for (const key of Object.keys(expenseData())) {
+      const data = expenseData();
+      delete data[key];
+      await denied(setDoc(expense(alice, `missing-${key}`), data));
+    }
+    await denied(updateDoc(expense(alice), { amountCents: 2000 }));
+    await denied(setDoc(expense(alice), expenseData()));
+    await denied(deleteDoc(expense(bob)));
+    await denied(setDoc(doc(alice, `${path}/expenses/expense-1/nested/bypass`), { any: true }));
+    await denied(getDoc(doc(alice, `${path}/expenses/expense-1/nested/bypass`)));
+    await allowed(runTransaction(alice, async tx => {
+      if (!(await tx.get(expense(alice, 'retry'))).exists()) tx.set(expense(alice, 'retry'), expenseData());
+    }));
+    await allowed(runTransaction(alice, async tx => {
+      if (!(await tx.get(expense(alice, 'retry'))).exists()) tx.set(expense(alice, 'retry'), expenseData());
+    }));
+    assert.equal((await getDocs(collection(alice, `${path}/expenses`))).size, 2);
+    checks++;
+    await allowed(setDoc(expense(alice, 'alice-paid'), { ...expenseData(),
+      payerUid: 'alice', payerLabel: 'alice@example.com' }));
+    const historyQuery = await getDocs(query(collection(alice, `${path}/expenses`), orderBy('date', 'desc')));
+    assert.equal(historyQuery.docs[0].id, 'alice-paid');
+    assert.equal(historyQuery.docs[0].data().creatorUid, 'alice');
+    assert.equal(historyQuery.docs[0].data().date instanceof Timestamp, true);
+    checks++;
+
     const feature = db => doc(db, `${path}/chores/chore-1`);
     await allowed(setDoc(feature(alice), { title: 'Sweep', assigneeUid: 'bob' }));
     await allowed(getDoc(feature(bob)));
@@ -113,6 +167,9 @@ async function main() {
 
     // multiple households and private selection don't affect other members
     await allowed(setDoc(doc(alice, `households/${second}`), details));
+    const singleExpense = doc(alice, `households/${second}/expenses/legacy-label`);
+    await allowed(setDoc(singleExpense, { ...expenseData(), payerUid: 'alice', payerLabel: 'alice',
+      participantUids: ['alice'] }));
     const legacyMember = doc(alice, `households/${second}/members/alice`);
     assert.equal((await getDoc(legacyMember)).exists(), false);
     checks++;
@@ -138,12 +195,40 @@ async function main() {
     await allowed(getDoc(home(bob)));
     await allowed(getDoc(feature(bob)));
 
+    await denied(getDoc(expense(alice)));
+    await denied(setDoc(expense(alice, 'left'), expenseData()));
+    await allowed(getDoc(expense(bob, 'alice-paid')));
+    const history = (await getDoc(expense(bob, 'alice-paid'))).data();
+    assert.deepEqual(history.participantUids, ['alice', 'bob']);
+    assert.equal(history.payerLabel, 'alice@example.com');
+    checks++;
+    await denied(setDoc(expense(bob, 'stale'), { ...expenseData(), creatorUid: 'bob' }));
+    await denied(setDoc(expense(bob, 'departed-payer'), { ...expenseData(),
+      creatorUid: 'bob', payerUid: 'alice', payerLabel: 'alice@example.com', participantUids: ['bob'] }));
+    await allowed(setDoc(expense(bob, 'single'), { ...expenseData(), creatorUid: 'bob', participantUids: ['bob'] }));
+
+    const joinAgain = writeBatch(alice);
+    joinAgain.update(home(alice), { memberUids: arrayUnion('alice') });
+    joinAgain.set(member(alice, 'alice'), { label: 'alice@example.com' });
+    await allowed(joinAgain.commit());
+    await allowed(updateDoc(home(eve), { memberUids: arrayUnion('eve') }));
+    const threePersonExpense = { ...expenseData(), participantUids: ['eve', 'bob', 'alice'],
+      payerUid: 'eve', payerLabel: 'eve' };
+    await allowed(setDoc(expense(alice, 'three'), threePersonExpense));
+    await denied(setDoc(expense(alice, 'three-missing'), expenseData()));
+    assert.deepEqual((await getDoc(expense(alice, 'three'))).data().participantUids, ['eve', 'bob', 'alice']);
+    assert.deepEqual((await getDoc(expense(alice, 'alice-paid'))).data().participantUids, ['alice', 'bob']);
+    checks++;
+    await allowed(updateDoc(home(eve), { memberUids: arrayRemove('eve') }));
+    await allowed(updateDoc(home(alice), { memberUids: arrayRemove('alice') }));
+
     const leave = writeBatch(bob);
     leave.update(home(bob), { memberUids: arrayRemove('bob') });
     leave.set(user(bob, 'bob'), { activeHouseholdId: null });
     await allowed(leave.commit());
     await denied(getDoc(home(bob)));
     await denied(getDoc(feature(bob)));
+    await denied(getDoc(expense(bob)));
     await denied(getDoc(member(bob, 'bob')));
     await denied(getDocs(collection(bob, `${path}/members`)));
     await denied(setDoc(member(bob, 'bob'), { label: 'bob@example.com' }));
