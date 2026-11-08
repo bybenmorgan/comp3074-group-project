@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "401423067370",
+    "project_id": "shared-household-manager",
+    "storage_bucket": "shared-household-manager.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401423067370:android:7f37c9b9c2736c9e838f93",
+        "android_client_info": {
+          "package_name": "ca.gbc.comp3074.morgan_ben.group_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfFLX3XW5L8-SH7oklASSwaMhxEKNqdf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function member(householdId) {
+      return signedIn() && request.auth.uid in
+        get(/databases/$(database)/documents/households/$(householdId)).data.memberUids;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['activeHouseholdId'])
+        && (request.resource.data.activeHouseholdId == null
+          || (request.resource.data.activeHouseholdId is string
+            && request.auth.uid in getAfter(/databases/$(database)/documents/households/$(request.resource.data.activeHouseholdId)).data.memberUids));
+      allow delete: if false;
+    }
+
+    // The random case sensitive document id is also the bearer invite code
+    match /households/{householdId} {
+      function validDetails() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['name', 'hasPet', 'petName', 'memberUids'])
+          && data.keys().hasOnly(['name', 'hasPet', 'petName', 'memberUids'])
+          && data.name is string && data.name.size() > 0 && data.name.size() <= 80
+          && data.hasPet is bool
+          && data.petName is string && data.petName.size() <= 80
+          && data.memberUids is list
+          && data.memberUids.size() == data.memberUids.toSet().size();
+      }
+
+      function selfJoin() {
+        let before = resource.data.memberUids;
+        let after = request.resource.data.memberUids;
+        return !(request.auth.uid in before)
+          && after.toSet() == before.toSet().union([request.auth.uid].toSet());
+      }
+
+      function selfLeave() {
+        return request.auth.uid in resource.data.memberUids
+          && request.resource.data.memberUids.toSet()
+            == resource.data.memberUids.toSet().difference([request.auth.uid].toSet());
+      }
+
+      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if signedIn() && householdId.matches('[A-Za-z0-9]{20}')
+        && validDetails() && request.resource.data.memberUids == [request.auth.uid];
+      allow update: if signedIn() && validDetails() && (
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberUids'])
+          && (selfJoin() || selfLeave()))
+        || (request.auth.uid in resource.data.memberUids
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasPet', 'petName']))
+      );
+      allow delete: if false;
+
+      match /members/{uid} {
+        allow read: if member(householdId);
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.auth.uid in getAfter(/databases/$(database)/documents/households/$(householdId)).data.memberUids
+          && request.resource.data.keys().hasOnly(['label'])
+          && request.resource.data.label is string
+          && request.resource.data.label.size() > 0
+          && request.resource.data.label == request.auth.token.email;
+        allow delete: if false;
+      }
+
+      match /expenses/{expenseId} {
+        function validExpense() {
+          let data = request.resource.data;
+          let members = get(/databases/$(database)/documents/households/$(householdId)).data.memberUids;
+          let payer = /databases/$(database)/documents/households/$(householdId)/members/$(data.payerUid);
+          return data.keys().hasAll(['description', 'amountCents', 'payerUid', 'payerLabel',
+              'participantUids', 'creatorUid', 'date'])
+            && data.keys().hasOnly(['description', 'amountCents', 'payerUid', 'payerLabel',
+              'participantUids', 'creatorUid', 'date'])
+            && data.description is string && data.description.size() <= 120
+            && !data.description.matches('\\s*')
+            && data.amountCents is int && data.amountCents > 0 && data.amountCents <= 999999999
+            && data.payerUid is string && data.payerUid in members
+            && data.payerLabel is string && data.payerLabel.size() > 0 && data.payerLabel.size() <= 320
+            && data.payerLabel == (exists(payer) ? get(payer).data.label : data.payerUid)
+            && data.participantUids is list
+            && data.participantUids.size() == data.participantUids.toSet().size()
+            && data.participantUids.toSet() == members.toSet()
+            && data.creatorUid == request.auth.uid
+            && data.date is timestamp && data.date == request.time;
+        }
+
+        allow read: if member(householdId);
+        allow create: if member(householdId) && validExpense();
+        allow update, delete: if false;
+      }
+
+      match /{collection}/{document=**} {
+        allow read, write: if !(collection in ['members', 'expenses']) && member(householdId);
+      }
+    }
+  }
+}

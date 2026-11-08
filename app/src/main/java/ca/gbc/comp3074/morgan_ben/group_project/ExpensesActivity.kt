@@ -4,31 +4,44 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
+import java.text.DateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
 
 class ExpensesActivity : AppCompatActivity() {
     private val store by lazy { HouseholdRepository(this) }
+    private val model by viewModels<ExpensesViewModel>()
+    private var addDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_expenses)
+        watchAccount()
         bindHouseholdChrome(store)
         findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
@@ -44,7 +57,18 @@ class ExpensesActivity : AppCompatActivity() {
             finish()
         }
         findViewById<MaterialButton>(R.id.add_expense).setOnClickListener { showAddDialog() }
-        renderList()
+        findViewById<MaterialButton>(R.id.expense_retry).setOnClickListener { model.retry() }
+        findViewById<MaterialButton>(R.id.expense_discard).setOnClickListener { model.discardFailedSave() }
+        model.changed.observe(this) {
+            if (!requireHousehold()) return@observe
+            bindHouseholdChrome(store)
+            renderList()
+            if (!model.dialogOpen || model.loading) {
+                addDialog?.dismiss()
+                addDialog = null
+            }
+            if (model.dialogOpen && addDialog == null && !model.loading) showAddDialog()
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.expenses_main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -54,70 +78,111 @@ class ExpensesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!requireHousehold()) return
         bindHouseholdChrome(store)
-        renderList()
+        model.refresh()
     }
 
     private fun showAddDialog() {
+        if (!model.canAdd || addDialog != null) return
+        model.dialogOpen = true
+        val members = HouseholdSession.current()?.active?.members.orEmpty()
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_expense, null)
         val titleInput = dialogView.findViewById<EditText>(R.id.expense_title_input)
         val amountInput = dialogView.findViewById<EditText>(R.id.expense_amount_input)
-        val payerInput = dialogView.findViewById<EditText>(R.id.expense_payer_input)
-        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Household_Dialog)
+        val payerInput = dialogView.findViewById<Spinner>(R.id.expense_payer_input)
+        titleInput.setText(model.description)
+        amountInput.setText(model.amount)
+        titleInput.doAfterTextChanged { model.description = it.toString() }
+        amountInput.doAfterTextChanged { model.amount = it.toString() }
+        payerInput.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
+            listOf(getString(R.string.expense_select_payer)) + members.map { it.label })
+        payerInput.setSelection(members.indexOfFirst { it.uid == model.payerUid } + 1)
+        payerInput.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                model.payerUid = members.getOrNull(position - 1)?.uid
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { model.payerUid = null }
+        }
+        val dialog = MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Household_Dialog)
             .setTitle(R.string.expenses_add)
             .setView(dialogView)
-            .setPositiveButton(R.string.pet_save_appointment) { _, _ ->
-                val name = titleInput.text.toString().trim().ifEmpty {
-                    getString(R.string.expense_default_title)
-                }
-                val amount = amountInput.text.toString().replace("$", "").toDoubleOrNull() ?: 0.0
-                val payer = payerInput.text.toString().trim().ifEmpty {
-                    getString(R.string.expense_payer_ben)
-                }
-                store.saveExpenses(
-                    listOf(
-                        ExpenseItem(name, amount, payer, HouseholdRepository.todayShort())
-                    ) + store.expenses()
-                )
-                renderList()
-            }
-            .setNegativeButton(R.string.pet_cancel, null)
-            .show()
+            .setPositiveButton(R.string.pet_save_appointment, null)
+            .setNegativeButton(R.string.pet_cancel) { _, _ -> model.dialogOpen = false }
+            .create()
+        addDialog = dialog
+        dialog.setOnCancelListener { model.dialogOpen = false }
+        dialog.setOnDismissListener { addDialog = null }
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val validTitle = model.description.isNotBlank() && model.description.trim().length <= 120
+            val validAmount = parseExpenseCents(model.amount) != null
+            titleInput.error = if (validTitle) null else getString(R.string.expense_description_invalid)
+            amountInput.error = if (validAmount) null else getString(R.string.expense_amount_invalid)
+            val validPayer = members.any { it.uid == model.payerUid }
+            dialogView.findViewById<TextView>(R.id.expense_payer_error).visibility =
+                if (validPayer) View.GONE else View.VISIBLE
+            if (validTitle && validAmount && validPayer) model.save()
+        }
+    }
+
+    override fun onDestroy() {
+        addDialog?.dismiss()
+        super.onDestroy()
     }
 
     private fun renderList() {
         val list = findViewById<LinearLayout>(R.id.expense_list)
         val empty = findViewById<TextView>(R.id.expense_empty)
         list.removeAllViews()
-        val items = store.expenses()
-        empty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        val ready = model.ready && model.matchesHousehold
+        val items = if (model.matchesHousehold) model.items else emptyList()
+        empty.visibility = if (ready && items.isEmpty()) View.VISIBLE else View.GONE
+        findViewById<MaterialButton>(R.id.add_expense).isEnabled = model.canAdd
+        findViewById<TextView>(R.id.expense_status).apply {
+            visibility = if (model.loading || model.saving || model.error != null) View.VISIBLE else View.GONE
+            text = getString(model.error ?: if (model.saving) R.string.expense_saving else R.string.expense_loading)
+        }
+        findViewById<MaterialButton>(R.id.expense_retry).visibility =
+            if (model.error != null && !model.loading && !model.saving) View.VISIBLE else View.GONE
+        findViewById<MaterialButton>(R.id.expense_discard).visibility =
+            if (model.failedSave) View.VISIBLE else View.GONE
         val inflater = LayoutInflater.from(this)
         items.forEach { item ->
             val row = inflater.inflate(R.layout.item_expense, list, false)
             bindItem(row, item)
             list.addView(row)
         }
-        val balance = store.youOwe()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+        val debts = expenseDebts(uid, items)
+        val balance = debts.values.sum()
         val label = findViewById<TextView>(R.id.expenses_owe_label)
         val amount = findViewById<TextView>(R.id.expenses_balance)
         label.setText(
             when {
-                abs(balance) < 0.005 -> R.string.expenses_settled
-                balance < 0 -> R.string.expenses_you_are_owed
-                else -> R.string.expenses_you_owe
+                balance == 0L -> R.string.expense_net_zero
+                balance < 0 -> R.string.expense_net_owed
+                else -> R.string.expense_net_owe
             }
         )
-        amount.text = String.format(Locale.US, "$%.2f", abs(balance))
+        amount.text = if (ready) expenseMoney(abs(balance)) else getString(R.string.expense_balance_unknown)
+        val labels = items.asReversed().associate { it.payerUid to it.payerLabel } +
+            HouseholdSession.current()?.active?.members.orEmpty().associate { it.uid to it.label }
+        findViewById<TextView>(R.id.expense_breakdown).text = debts.entries.joinToString("\n") { (person, cents) ->
+            getString(if (cents > 0) R.string.expense_owe_person else R.string.expense_person_owes,
+                labels[person] ?: person, expenseMoney(abs(cents)))
+        }
     }
 
-    private fun bindItem(row: View, item: ExpenseItem) {
-        row.findViewById<ImageView>(R.id.expense_icon).setImageResource(iconFor(item.name))
-        row.findViewById<TextView>(R.id.expense_name).text = item.name
+    private fun bindItem(row: View, item: SharedExpense) {
+        row.findViewById<ImageView>(R.id.expense_icon).setImageResource(iconFor(item.description))
+        row.findViewById<TextView>(R.id.expense_name).text = item.description
         row.findViewById<TextView>(R.id.expense_payer).text =
-            getString(R.string.expense_paid_by, item.payer)
+            getString(R.string.expense_paid_by, item.payerLabel)
         row.findViewById<TextView>(R.id.expense_amount).text =
-            String.format(Locale.US, "$%.2f", item.amount)
-        row.findViewById<TextView>(R.id.expense_date).text = item.date
+            expenseMoney(item.amountCents)
+        row.findViewById<TextView>(R.id.expense_date).text =
+            DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(item.dateMillis))
     }
 
     private fun iconFor(name: String): Int {

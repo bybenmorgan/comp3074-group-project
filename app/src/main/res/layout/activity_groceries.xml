@@ -246,6 +246,28 @@
                                 android:paddingTop="8dp" />
 
                             <TextView
+                                android:id="@+id/grocery_status"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="12dp"
+                                android:textAppearance="@style/TextAppearance.Household.Caption"
+                                android:visibility="gone" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/grocery_retry"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/expense_retry"
+                                android:visibility="gone" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/grocery_discard"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/list_discard"
+                                android:visibility="gone" />
+
+                            <TextView
                                 android:id="@+id/grocery_empty"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
