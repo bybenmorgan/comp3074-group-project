@@ -37,6 +37,23 @@
         android:textColor="@color/dashboard_text"
         android:textColorHint="@color/dashboard_text_secondary" />
 
+    <TextView
+        android:id="@+id/expense_due_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_status_row"
+        android:clickable="true"
+        android:contentDescription="@string/expense_choose_due"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:hint="@string/expense_due_hint"
+        android:minHeight="52dp"
+        android:padding="12dp"
+        android:textAppearance="@style/TextAppearance.Household.Body"
+        android:textColor="@color/dashboard_text"
+        android:textColorHint="@color/dashboard_text_secondary" />
+
     <Spinner
         android:id="@+id/expense_payer_input"
         android:layout_width="match_parent"

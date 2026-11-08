@@ -56,6 +56,28 @@
         android:textAppearance="@style/TextAppearance.Household.Caption" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/household_edit_pet"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/household_edit_pet"
+        android:textColor="@color/dashboard_text" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/household_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:minHeight="48dp"
+        android:text="@string/household_switch"
+        android:textAppearance="@style/TextAppearance.Household.Body"
+        android:textColor="@color/dashboard_text"
+        app:backgroundTint="@color/dashboard_cream"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/dashboard_outline"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/household_remove"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

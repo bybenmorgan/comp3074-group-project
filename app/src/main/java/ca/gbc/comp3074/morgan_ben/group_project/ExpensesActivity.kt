@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.app.DatePickerDialog
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -23,6 +24,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import java.text.DateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
@@ -43,7 +45,6 @@ class ExpensesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_expenses)
         watchAccount()
         bindHouseholdChrome(store)
-        findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))
             finish()
@@ -90,9 +91,24 @@ class ExpensesActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_expense, null)
         val titleInput = dialogView.findViewById<EditText>(R.id.expense_title_input)
         val amountInput = dialogView.findViewById<EditText>(R.id.expense_amount_input)
+        val dueInput = dialogView.findViewById<TextView>(R.id.expense_due_input)
         val payerInput = dialogView.findViewById<Spinner>(R.id.expense_payer_input)
         titleInput.setText(model.description)
         amountInput.setText(model.amount)
+        fun showDue() {
+            dueInput.text = getString(R.string.expense_due, mediumDate(model.dueMillis))
+        }
+        showDue()
+        dueInput.setOnClickListener {
+            val current = Calendar.getInstance().apply { timeInMillis = model.dueMillis }
+            DatePickerDialog(this, { _, year, month, day ->
+                val picked = Calendar.getInstance()
+                picked.set(year, month, day, 0, 0, 0)
+                picked.set(Calendar.MILLISECOND, 0)
+                model.dueMillis = picked.timeInMillis
+                showDue()
+            }, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH)).show()
+        }
         titleInput.doAfterTextChanged { model.description = it.toString() }
         amountInput.doAfterTextChanged { model.amount = it.toString() }
         payerInput.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
@@ -182,8 +198,11 @@ class ExpensesActivity : AppCompatActivity() {
         row.findViewById<TextView>(R.id.expense_amount).text =
             expenseMoney(item.amountCents)
         row.findViewById<TextView>(R.id.expense_date).text =
-            DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(item.dateMillis))
+            getString(R.string.expense_due, mediumDate(item.dueMillis))
     }
+
+    private fun mediumDate(millis: Long): String =
+        DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(millis))
 
     private fun iconFor(name: String): Int {
         val lower = name.lowercase(Locale.US)

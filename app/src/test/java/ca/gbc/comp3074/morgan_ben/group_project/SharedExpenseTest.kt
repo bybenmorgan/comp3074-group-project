@@ -2,10 +2,24 @@ package ca.gbc.comp3074.morgan_ben.group_project
 
 import org.junit.Assert.*
 import org.junit.Test
+import java.util.Calendar
 
 class SharedExpenseTest {
     private fun expense(cents: Long, payer: String = "alice", people: List<String> = listOf("alice", "bob")) =
         SharedExpense("id", "Food", cents, payer, "$payer@example.com", people, "alice", 1)
+
+    @Test fun dueDateKeepsTheChosenCalendarDay() {
+        val noon = Calendar.getInstance().apply {
+            set(2026, Calendar.NOVEMBER, 15, 12, 30, 45)
+            set(Calendar.MILLISECOND, 500)
+        }
+        val day = Calendar.getInstance().apply { timeInMillis = startOfDay(noon.timeInMillis) }
+        assertEquals(2026, day.get(Calendar.YEAR))
+        assertEquals(Calendar.NOVEMBER, day.get(Calendar.MONTH))
+        assertEquals(15, day.get(Calendar.DAY_OF_MONTH))
+        assertEquals(0, day.get(Calendar.HOUR_OF_DAY))
+        assertEquals(0, day.get(Calendar.MINUTE))
+    }
 
     @Test fun parsesWholeCentsExactly() {
         mapOf("1" to 100L, "1.2" to 120L, "1.23" to 123L, "0.01" to 1L,

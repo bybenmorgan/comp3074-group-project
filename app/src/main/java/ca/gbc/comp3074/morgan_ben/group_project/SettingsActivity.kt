@@ -38,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         setContentView(R.layout.activity_settings)
         watchAccount()
+        bindHomeButton()
         onBackPressedDispatcher.addCallback(this, pendingBack)
         findViewById<MaterialButton>(R.id.add_household).setOnClickListener { showAddDialog() }
         findViewById<MaterialButton>(R.id.settings_join_household).setOnClickListener { showJoinDialog() }
@@ -146,18 +147,27 @@ class SettingsActivity : AppCompatActivity() {
             row.findViewById<View>(R.id.household_current).visibility =
                 if (household.id == membership?.activeId) View.VISIBLE else View.GONE
             row.findViewById<TextView>(R.id.household_pet_name).text = if (household.hasPet) {
-                getString(R.string.household_pet_is, household.petName)
+                getString(R.string.household_pet_is, household.petName.ifBlank { getString(R.string.household_pet_name_hint) })
             } else getString(R.string.household_no_pet)
             row.findViewById<SwitchCompat>(R.id.household_pet_switch).apply {
                 isChecked = household.hasPet
                 isEnabled = enabled
                 setOnCheckedChangeListener { _, checked ->
-                    if (checked) promptPetName(household)
+                    if (checked) showPetDialog(household, true)
                     else request.pet(household, false, household.petName)
                 }
             }
-            row.isEnabled = enabled
-            row.setOnClickListener { if (enabled) request.select(household.id) }
+            row.isClickable = false
+            row.findViewById<MaterialButton>(R.id.household_edit_pet).apply {
+                isEnabled = enabled
+                setOnClickListener { if (enabled) showPetDialog(household) }
+            }
+            row.findViewById<MaterialButton>(R.id.household_switch).apply {
+                val current = household.id == membership?.activeId
+                visibility = if (current) View.GONE else View.VISIBLE
+                isEnabled = enabled
+                setOnClickListener { if (enabled) request.select(household.id) }
+            }
             row.findViewById<MaterialButton>(R.id.household_remove).apply {
                 setText(R.string.household_leave)
                 isEnabled = enabled
@@ -169,19 +179,33 @@ class SettingsActivity : AppCompatActivity() {
             request.error == null && membership?.active == null) openHouseholdSetup()
     }
 
-    private fun promptPetName(household: Household) {
+    private fun showPetDialog(household: Household, enable: Boolean = household.hasPet) {
         val view = layoutInflater.inflate(R.layout.dialog_add_household, null)
         view.findViewById<EditText>(R.id.household_name_input).visibility = View.GONE
-        view.findViewById<SwitchCompat>(R.id.household_include_pet).visibility = View.GONE
-        val input = view.findViewById<EditText>(R.id.household_pet_name_input)
-        input.setText(household.petName)
-        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Household_Dialog)
-            .setTitle(R.string.household_pet_name_hint).setView(view)
-            .setPositiveButton(R.string.pet_save_appointment) { _, _ ->
-                request.pet(household, true, input.text.toString().trim())
+        val petSwitch = view.findViewById<SwitchCompat>(R.id.household_include_pet)
+        val petName = view.findViewById<EditText>(R.id.household_pet_name_input)
+        petSwitch.isChecked = enable
+        petName.setText(household.petName)
+        petName.visibility = if (enable) View.VISIBLE else View.GONE
+        petSwitch.setOnCheckedChangeListener { _, checked ->
+            petName.visibility = if (checked) View.VISIBLE else View.GONE
+        }
+        val dialog = MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Household_Dialog)
+            .setTitle(R.string.household_pet_settings).setView(view)
+            .setPositiveButton(R.string.pet_save_appointment, null)
+            .setNegativeButton(R.string.pet_cancel, null).create()
+        dialog.setOnShowListener {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val name = petName.text.toString().trim()
+                if (name.length > 80) petName.error = getString(R.string.household_pet_name_invalid)
+                else {
+                    request.pet(household, petSwitch.isChecked, name)
+                    dialog.dismiss()
+                }
             }
-            .setNegativeButton(R.string.pet_cancel, null)
-            .setOnDismissListener { renderList() }.show()
+        }
+        dialog.setOnDismissListener { renderList() }
+        dialog.show()
     }
 
     private fun confirmLeave(household: Household) {

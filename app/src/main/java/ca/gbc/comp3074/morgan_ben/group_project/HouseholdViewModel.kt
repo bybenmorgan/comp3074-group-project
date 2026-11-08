@@ -51,8 +51,15 @@ class HouseholdViewModel : ViewModel() {
     }
 
     fun join(code: String) {
-        if (!validInviteCode(code)) return fail(R.string.household_code_invalid)
-        write(joining = true) { store.join(code) }
+        val invite = code.trim()
+        if (!validInviteCode(invite)) return fail(R.string.household_code_invalid)
+        val membership = HouseholdSession.current()
+        val existing = membership?.households?.firstOrNull { it.id == invite }
+        if (existing != null) {
+            if (existing.id != membership.activeId) select(existing.id)
+            return
+        }
+        write(joining = true) { store.join(invite) }
     }
 
     fun select(id: String) = write { store.select(id) }

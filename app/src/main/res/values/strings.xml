@@ -11,6 +11,9 @@
     <string name="household_setup_error">Firestore isn’t ready. Check that the default database has been created.</string>
     <string name="household_request_error">Couldn’t load or save your households. Check your connection and Firestore setup, then try again.</string>
     <string name="household_saved_refresh">Your change was saved, but the household list couldn’t refresh. Refresh before making another change.</string>
+    <string name="household_switch">Switch to this household</string>
+    <string name="household_edit_pet">Change pet</string>
+    <string name="household_pet_settings">Pet settings</string>
     <string name="household_leave">Leave household</string>
     <string name="household_leave_confirm">Leave %1$s? Other members and household data will stay. If this is your last household, you’ll return to setup.</string>
     <string name="household_copy_code">Copy invite code</string>
@@ -69,12 +72,13 @@
     <string name="pet_walked">Walked</string>
     <string name="pet_fed">Fed</string>
     <string name="pet_done">Done</string>
-    <string name="feature_dashboard">Dashboard, current screen</string>
+    <string name="feature_dashboard">Home, current screen</string>
     <string name="feature_chores">Chores</string>
     <string name="feature_groceries">Groceries</string>
     <string name="feature_pet_care">Pet Care</string>
     <string name="feature_expenses">Expenses</string>
-    <string name="return_to_dashboard">Return to Dashboard</string>
+    <string name="open_home">Household Manager, go home</string>
+    <string name="return_to_dashboard">Home</string>
     <string name="feature_expenses_current">Expenses, current screen</string>
     <string name="expenses_title">Expenses &amp; Finances</string>
     <string name="expenses_you_owe">You owe</string>
@@ -135,6 +139,9 @@
     <string name="expenses_settled">Settled up</string>
     <string name="expense_title_hint">Expense name</string>
     <string name="expense_amount_hint">Amount, e.g. 24.50</string>
+    <string name="expense_due_hint">When it needs to be paid</string>
+    <string name="expense_due">Due %1$s</string>
+    <string name="expense_choose_due">Choose the due date</string>
     <string name="expense_payer_hint">Paid by, e.g. Ben</string>
     <string name="expense_paid_by">Paid by %1$s</string>
     <string name="expense_payer_ben">Ben</string>
@@ -211,4 +218,9 @@
     <string name="household_pet_name_hint">Pet name</string>
     <string name="household_pet_is">Pet: %1$s</string>
     <string name="household_no_pet">No pet in this household</string>
+    <string name="list_loading">Loading household…</string>
+    <string name="list_saving">Saving…</string>
+    <string name="list_load_failed">Could not load this household. Check your connection and retry.</string>
+    <string name="list_save_failed">Could not save. Check your connection and household membership, then retry.</string>
+    <string name="list_discard">Discard failed change</string>
 </resources>

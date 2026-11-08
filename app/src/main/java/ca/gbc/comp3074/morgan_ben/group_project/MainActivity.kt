@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,7 +16,9 @@ import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
     private val store by lazy { HouseholdRepository(this) }
+    private val board by viewModels<HouseholdBoardViewModel>()
     private var expenseRequest = 0
+    private var expenseFailed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +47,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ExpensesActivity::class.java))
         }
         findViewById<MaterialButton>(R.id.dashboard_expense_retry).setOnClickListener {
-            if (requireHousehold()) refreshExpenses()
+            if (!requireHousehold()) return@setOnClickListener
+            refreshExpenses()
+            board.refresh()
+        }
+        board.changed.observe(this) {
+            if (!requireHousehold()) return@observe
+            bindHouseholdChrome(store)
+            bindDashboard()
         }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -58,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         if (!requireHousehold()) return
         bindHouseholdChrome(store)
         bindDashboard()
+        showActiveHousehold()
+        board.refresh()
         refreshExpenses()
     }
 
@@ -73,11 +85,13 @@ class MainActivity : AppCompatActivity() {
         val ticket = ++expenseRequest
         findViewById<TextView>(R.id.dashboard_expense_label).setText(R.string.expense_loading)
         findViewById<TextView>(R.id.dashboard_expense_balance).setText(R.string.expense_balance_unknown)
-        findViewById<View>(R.id.dashboard_expense_retry).visibility = View.GONE
+        expenseFailed = false
+        showDashboardRetry()
         FirestoreHouseholds(uid).load().addOnCompleteListener(this) { membership ->
             if (ticket != expenseRequest || !HouseholdSession.isCurrent(uid, version) ||
                 HouseholdSession.current()?.active?.id != householdId) return@addOnCompleteListener
             if (!membership.isSuccessful) {
+                expenseFailed = true
                 showExpenseError()
                 return@addOnCompleteListener
             }
@@ -90,9 +104,12 @@ class MainActivity : AppCompatActivity() {
                 if (ticket != expenseRequest || !HouseholdSession.isCurrent(uid, version) ||
                     HouseholdSession.current()?.active?.id != activeId) return@expensesLoaded
                 if (!expenses.isSuccessful) {
+                    expenseFailed = true
                     showExpenseError()
                     return@expensesLoaded
                 }
+                expenseFailed = false
+                showDashboardRetry()
                 val balance = expenseDebts(uid, expenses.result).values.sum()
                 findViewById<TextView>(R.id.dashboard_expense_label).setText(when {
                     balance > 0 -> R.string.expense_net_owe
@@ -106,30 +123,46 @@ class MainActivity : AppCompatActivity() {
 
     private fun showExpenseError() {
         findViewById<TextView>(R.id.dashboard_expense_label).setText(R.string.expense_load_failed)
-        findViewById<View>(R.id.dashboard_expense_retry).visibility = View.VISIBLE
+        showDashboardRetry()
+    }
+
+    private fun showDashboardRetry() {
+        val boardFailed = board.error != null && !board.loading && !board.saving
+        findViewById<View>(R.id.dashboard_expense_retry).visibility =
+            if (expenseFailed || boardFailed) View.VISIBLE else View.GONE
     }
 
     private fun bindDashboard() {
         findViewById<TextView>(R.id.events_day).text = HouseholdRepository.todayHeader()
         findViewById<TextView>(R.id.events_date).text = HouseholdRepository.todayBadge()
 
-        val groceries = store.groceries()
+        showDashboardRetry()
+        showActiveHousehold()
+        val groceries = if (board.ready) board.groceries else emptyList()
         val neededGroceries = groceries.filter { !it.checked }.map { it.name }
         findViewById<TextView>(R.id.notice_one).text = when {
+            !board.ready && board.error != null -> getString(board.error!!)
+            !board.ready -> getString(R.string.list_loading)
+            board.error != null -> getString(board.error!!)
             groceries.isEmpty() -> getString(R.string.dashboard_no_groceries)
             neededGroceries.isEmpty() -> getString(R.string.notice_all_caught_up)
             else -> getString(R.string.notice_need_item, neededGroceries[0])
         }
         findViewById<TextView>(R.id.notice_two).apply {
-            visibility = if (neededGroceries.size > 1) View.VISIBLE else View.GONE
+            visibility = if (board.ready && board.error == null && neededGroceries.size > 1) {
+                View.VISIBLE
+            } else View.GONE
             text = neededGroceries.getOrNull(1)?.let { getString(R.string.notice_need_item, it) }
         }
 
         val household = store.currentHousehold()
-        val openChores = store.chores().filter { !it.done }.map { it.title }
-        val nextAppointment = if (household.hasPet) store.appointments().firstOrNull() else null
-        findViewById<TextView>(R.id.event_one).text =
-            openChores.getOrNull(0) ?: getString(R.string.event_no_chores)
+        val openChores = if (board.ready) board.chores.filter { !it.done }.map { it.title } else emptyList()
+        val nextAppointment = if (household.hasPet && board.ready) board.appointments.firstOrNull() else null
+        findViewById<TextView>(R.id.event_one).text = when {
+            !board.ready && board.error != null -> getString(board.error!!)
+            !board.ready -> getString(R.string.list_loading)
+            else -> openChores.getOrNull(0) ?: getString(R.string.event_no_chores)
+        }
         findViewById<TextView>(R.id.event_two).apply {
             visibility = if (openChores.size > 1) View.VISIBLE else View.GONE
             text = openChores.getOrNull(1)
@@ -143,14 +176,18 @@ class MainActivity : AppCompatActivity() {
 
         bindPetStatus(
             findViewById(R.id.pet_walked_status),
-            store.petChecked(HouseholdRepository.PET_MORNING_WALK) ||
-                store.petChecked(HouseholdRepository.PET_NIGHT_WALK)
+            board.ready && (board.pet.checked(HouseholdRepository.PET_MORNING_WALK) ||
+                board.pet.checked(HouseholdRepository.PET_NIGHT_WALK))
         )
         bindPetStatus(
             findViewById(R.id.pet_fed_status),
-            store.petChecked(HouseholdRepository.PET_BREAKFAST) ||
-                store.petChecked(HouseholdRepository.PET_DINNER)
+            board.ready && (board.pet.checked(HouseholdRepository.PET_BREAKFAST) ||
+                board.pet.checked(HouseholdRepository.PET_DINNER))
         )
+    }
+
+    private fun showActiveHousehold() {
+        findViewById<TextView>(R.id.dashboard_household_name).text = store.currentHousehold().name
     }
 
     private fun bindPetStatus(view: TextView, done: Boolean) {

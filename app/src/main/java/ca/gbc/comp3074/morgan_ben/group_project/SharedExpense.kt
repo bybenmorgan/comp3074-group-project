@@ -1,5 +1,6 @@
 package ca.gbc.comp3074.morgan_ben.group_project
 
+import java.util.Calendar
 import java.util.Locale
 
 data class SharedExpense(
@@ -10,7 +11,8 @@ data class SharedExpense(
     val payerLabel: String,
     val participantUids: List<String>,
     val creatorUid: String,
-    val dateMillis: Long
+    val dateMillis: Long,
+    val dueMillis: Long = dateMillis
 ) {
     fun shares(): Map<String, Long> {
         val participants = participantUids.sorted()
@@ -31,6 +33,16 @@ internal fun parseExpenseCents(input: String): Long? {
     if (dollars > MAX_EXPENSE_CENTS / 100) return null
     val cents = dollars * 100 + (parts.getOrNull(1)?.padEnd(2, '0')?.toLong() ?: 0)
     return cents.takeIf { it in 1..MAX_EXPENSE_CENTS }
+}
+
+internal fun startOfDay(millis: Long): Long {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = millis
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
 }
 
 internal fun expenseMoney(cents: Long): String =

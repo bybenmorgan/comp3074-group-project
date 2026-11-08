@@ -101,6 +101,37 @@
                                 android:maxLines="1"
                                 android:textAppearance="@style/TextAppearance.Household.Body" />
                         </com.google.android.material.textfield.TextInputLayout>
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/create_include_pet"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:minHeight="48dp"
+                            android:text="@string/household_include_pet"
+                            android:textAppearance="@style/TextAppearance.Household.Body"
+                            android:textColor="@color/dashboard_text" />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/create_pet_name_layout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:hint="@string/household_pet_name_hint"
+                            android:visibility="gone"
+                            app:boxBackgroundColor="@color/dashboard_cream"
+                            app:boxCornerRadiusBottomEnd="16dp"
+                            app:boxCornerRadiusBottomStart="16dp"
+                            app:boxCornerRadiusTopEnd="16dp"
+                            app:boxCornerRadiusTopStart="16dp">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/create_pet_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:imeOptions="actionDone"
+                                android:inputType="textCapWords"
+                                android:maxLines="1"
+                                android:textAppearance="@style/TextAppearance.Household.Body" />
+                        </com.google.android.material.textfield.TextInputLayout>
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/create_household"
                             android:layout_width="match_parent"

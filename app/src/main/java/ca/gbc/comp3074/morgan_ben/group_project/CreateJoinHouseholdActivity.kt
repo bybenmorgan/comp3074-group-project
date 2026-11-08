@@ -9,6 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
@@ -35,12 +36,25 @@ class CreateJoinHouseholdActivity : AppCompatActivity() {
 
         val householdNameLayout = findViewById<TextInputLayout>(R.id.household_name_layout)
         val householdName = findViewById<TextInputEditText>(R.id.household_name)
+        val includePet = findViewById<SwitchCompat>(R.id.create_include_pet)
+        val petNameLayout = findViewById<TextInputLayout>(R.id.create_pet_name_layout)
+        val petName = findViewById<TextInputEditText>(R.id.create_pet_name)
+        includePet.setOnCheckedChangeListener { _, checked ->
+            petNameLayout.visibility = if (checked) View.VISIBLE else View.GONE
+            if (!checked) petNameLayout.error = null
+        }
         findViewById<MaterialButton>(R.id.create_household).setOnClickListener {
-            if (!validHouseholdName(householdName.text.toString().trim())) {
+            val name = householdName.text.toString().trim()
+            val pet = petName.text.toString().trim()
+            if (!validHouseholdName(name)) {
                 householdNameLayout.error = getString(R.string.household_name_invalid)
+            } else if (includePet.isChecked && pet.length > 80) {
+                householdNameLayout.error = null
+                petNameLayout.error = getString(R.string.household_pet_name_invalid)
             } else {
                 householdNameLayout.error = null
-                request.create(householdName.text.toString().trim())
+                petNameLayout.error = null
+                request.create(name, includePet.isChecked, if (includePet.isChecked) pet else "")
             }
         }
 
@@ -90,8 +104,10 @@ class CreateJoinHouseholdActivity : AppCompatActivity() {
         if (isFinishing) return
         pendingBack.isEnabled = request.busy
         val enabled = request.resolved && !request.busy && !request.refreshRequired
-        listOf(R.id.create_household, R.id.join_household, R.id.household_name, R.id.invite_code)
-            .forEach { findViewById<View>(it).isEnabled = enabled }
+        listOf(
+            R.id.create_household, R.id.join_household, R.id.household_name, R.id.invite_code,
+            R.id.create_include_pet, R.id.create_pet_name
+        ).forEach { findViewById<View>(it).isEnabled = enabled }
         findViewById<View>(R.id.household_progress).visibility = if (request.busy) View.VISIBLE else View.GONE
         findViewById<View>(R.id.household_retry).visibility =
             if (!request.busy && request.error != null) View.VISIBLE else View.GONE
