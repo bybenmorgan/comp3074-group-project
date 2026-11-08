@@ -37,11 +37,14 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/open_home"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:layout_weight="1"
                         android:accessibilityHeading="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:contentDescription="@string/open_home"
                         android:text="@string/dashboard_title"
                         android:textAppearance="@style/TextAppearance.Household.Heading"
                         android:textSize="25sp"

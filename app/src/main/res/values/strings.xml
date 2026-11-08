@@ -72,12 +72,13 @@
     <string name="pet_walked">Walked</string>
     <string name="pet_fed">Fed</string>
     <string name="pet_done">Done</string>
-    <string name="feature_dashboard">Dashboard, current screen</string>
+    <string name="feature_dashboard">Home, current screen</string>
     <string name="feature_chores">Chores</string>
     <string name="feature_groceries">Groceries</string>
     <string name="feature_pet_care">Pet Care</string>
     <string name="feature_expenses">Expenses</string>
-    <string name="return_to_dashboard">Return to Dashboard</string>
+    <string name="open_home">Household Manager, go home</string>
+    <string name="return_to_dashboard">Home</string>
     <string name="feature_expenses_current">Expenses, current screen</string>
     <string name="expenses_title">Expenses &amp; Finances</string>
     <string name="expenses_you_owe">You owe</string>
@@ -138,6 +139,9 @@
     <string name="expenses_settled">Settled up</string>
     <string name="expense_title_hint">Expense name</string>
     <string name="expense_amount_hint">Amount, e.g. 24.50</string>
+    <string name="expense_due_hint">When it needs to be paid</string>
+    <string name="expense_due">Due %1$s</string>
+    <string name="expense_choose_due">Choose the due date</string>
     <string name="expense_payer_hint">Paid by, e.g. Ben</string>
     <string name="expense_paid_by">Paid by %1$s</string>
     <string name="expense_payer_ben">Ben</string>

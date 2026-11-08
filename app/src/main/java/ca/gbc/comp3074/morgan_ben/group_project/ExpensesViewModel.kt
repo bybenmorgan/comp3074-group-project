@@ -20,6 +20,7 @@ class ExpensesViewModel : ViewModel() {
     var description = ""
     var amount = ""
     var payerUid: String? = null
+    var dueMillis = startOfDay(System.currentTimeMillis())
     private var uid = ""
     private var householdId = ""
     private var version = -1
@@ -89,7 +90,7 @@ class ExpensesViewModel : ViewModel() {
             if (description.isBlank() || description.trim().length > 120) return
             pending = SharedExpense(
                 FirestoreExpenses(householdId, uid).newId(), description.trim(), cents,
-                payer.uid, payer.label, members.map { it.uid }.sorted(), uid, 0
+                payer.uid, payer.label, members.map { it.uid }.sorted(), uid, 0, dueMillis
             )
         }
         val expense = pending!!
@@ -132,6 +133,7 @@ class ExpensesViewModel : ViewModel() {
         description = ""
         amount = ""
         payerUid = null
+        dueMillis = startOfDay(System.currentTimeMillis())
     }
 
     private fun loadFailed() {

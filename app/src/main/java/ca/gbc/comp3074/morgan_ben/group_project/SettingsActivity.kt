@@ -38,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         )
         setContentView(R.layout.activity_settings)
         watchAccount()
+        bindHomeButton()
         onBackPressedDispatcher.addCallback(this, pendingBack)
         findViewById<MaterialButton>(R.id.add_household).setOnClickListener { showAddDialog() }
         findViewById<MaterialButton>(R.id.settings_join_household).setOnClickListener { showJoinDialog() }

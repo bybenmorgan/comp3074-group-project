@@ -33,7 +33,6 @@ class GroceriesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_groceries)
         watchAccount()
         bindHouseholdChrome(store)
-        findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))
             finish()

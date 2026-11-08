@@ -105,7 +105,7 @@ async function main() {
     const expense = (db, id = 'expense-1') => doc(db, `${path}/expenses/${id}`);
     const expenseData = () => ({ description: 'Dinner', amountCents: 1001,
       payerUid: 'bob', payerLabel: 'bob@example.com', participantUids: ['alice', 'bob'],
-      creatorUid: 'alice', date: serverTimestamp() });
+      creatorUid: 'alice', date: serverTimestamp(), due: Timestamp.fromMillis(Date.UTC(2026, 10, 15)) });
     await allowed(setDoc(expense(alice), expenseData()));
     await allowed(getDoc(expense(bob)));
     await allowed(getDocs(query(collection(alice, `${path}/expenses`), orderBy('date', 'desc'))));
@@ -124,7 +124,8 @@ async function main() {
       { participantUids: [] }, { participantUids: ['alice'] },
       { participantUids: ['alice', 'bob', 'eve'] }, { participantUids: ['alice', 'bob', 'bob'] },
       { participantUids: 'alice,bob' }, { participantUids: ['alice', 123] },
-      { date: Timestamp.fromMillis(1) }, { date: 'today' }, { date: null }, { extra: true }
+      { date: Timestamp.fromMillis(1) }, { date: 'today' }, { date: null },
+      { due: 'Nov 15' }, { due: null }, { due: 1 }, { extra: true }
     ];
     for (const [i, change] of invalidExpenses.entries()) {
       await denied(setDoc(expense(alice, `invalid-${i}`), { ...expenseData(), ...change }));

@@ -34,7 +34,6 @@ class ChoresActivity : AppCompatActivity() {
         watchAccount()
         bindHouseholdChrome(store)
         findViewById<TextView>(R.id.chores_today_date).text = HouseholdRepository.todayLong()
-        findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_groceries).setOnClickListener {
             startActivity(Intent(this, GroceriesActivity::class.java))
             finish()
