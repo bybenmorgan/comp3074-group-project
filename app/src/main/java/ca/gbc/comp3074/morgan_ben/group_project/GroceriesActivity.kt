@@ -11,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,17 +20,19 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class GroceriesActivity : AppCompatActivity() {
     private val store by lazy { HouseholdRepository(this) }
+    private val board by viewModels<HouseholdBoardViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_groceries)
+        watchAccount()
         bindHouseholdChrome(store)
-        findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_chores).setOnClickListener {
             startActivity(Intent(this, ChoresActivity::class.java))
             finish()
@@ -43,7 +46,13 @@ class GroceriesActivity : AppCompatActivity() {
             finish()
         }
         findViewById<MaterialButton>(R.id.add_grocery).setOnClickListener { showAddItemDialog() }
-        renderList()
+        findViewById<MaterialButton>(R.id.grocery_retry).setOnClickListener { board.retry() }
+        findViewById<MaterialButton>(R.id.grocery_discard).setOnClickListener { board.discardFailedSave() }
+        board.changed.observe(this) {
+            if (!requireHousehold()) return@observe
+            bindHouseholdChrome(store)
+            renderList()
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.groceries_main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -53,11 +62,13 @@ class GroceriesActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!requireHousehold()) return
         bindHouseholdChrome(store)
-        renderList()
+        board.refresh(chores = false, groceries = true, pet = false)
     }
 
     private fun showAddItemDialog() {
+        if (!board.canEdit) return
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_grocery, null)
         val nameInput = dialogView.findViewById<EditText>(R.id.grocery_name_input)
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Household_Dialog)
@@ -67,8 +78,7 @@ class GroceriesActivity : AppCompatActivity() {
                 val name = nameInput.text.toString().trim().ifEmpty {
                     getString(R.string.groceries_item_default)
                 }
-                store.saveGroceries(store.groceries() + GroceryItem(name, false))
-                renderList()
+                board.addGrocery(name)
             }
             .setNegativeButton(R.string.pet_cancel, null)
             .show()
@@ -81,12 +91,21 @@ class GroceriesActivity : AppCompatActivity() {
         val progress = findViewById<ProgressBar>(R.id.groceries_progress)
         val progressCount = findViewById<TextView>(R.id.groceries_progress_count)
         list.removeAllViews()
-        val items = store.groceries()
-        empty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        val items = if (board.ready) board.groceries else emptyList()
+        empty.visibility = if (board.ready && items.isEmpty() && board.error == null) View.VISIBLE else View.GONE
+        findViewById<MaterialButton>(R.id.add_grocery).isEnabled = board.canEdit && items.size < MAX_HOUSEHOLD_LIST
+        findViewById<TextView>(R.id.grocery_status).apply {
+            visibility = if (board.loading || board.saving || board.error != null) View.VISIBLE else View.GONE
+            text = getString(board.error ?: if (board.saving) R.string.list_saving else R.string.list_loading)
+        }
+        findViewById<MaterialButton>(R.id.grocery_retry).visibility =
+            if (board.error != null && !board.loading && !board.saving) View.VISIBLE else View.GONE
+        findViewById<MaterialButton>(R.id.grocery_discard).visibility =
+            if (board.failedSave) View.VISIBLE else View.GONE
         val inflater = LayoutInflater.from(this)
-        items.forEachIndexed { index, item ->
+        items.forEach { item ->
             val row = inflater.inflate(R.layout.item_grocery, list, false)
-            bindItem(row, item, index)
+            bindItem(row, item)
             list.addView(row)
         }
         val checked = items.count { it.checked }
@@ -97,7 +116,7 @@ class GroceriesActivity : AppCompatActivity() {
         progressCount.text = getString(R.string.groceries_progress_count, checked, items.size)
     }
 
-    private fun bindItem(row: View, item: GroceryItem, index: Int) {
+    private fun bindItem(row: View, item: GroceryItem) {
         val check = row.findViewById<ImageView>(R.id.grocery_check)
         val done = row.findViewById<TextView>(R.id.grocery_done)
         row.findViewById<TextView>(R.id.grocery_name).text = item.name
@@ -107,13 +126,6 @@ class GroceriesActivity : AppCompatActivity() {
             if (item.checked) R.string.groceries_item_checked else R.string.groceries_item_unchecked,
             item.name
         )
-        row.setOnClickListener {
-            val items = store.groceries().toMutableList()
-            if (index in items.indices) {
-                items[index] = items[index].copy(checked = !items[index].checked)
-                store.saveGroceries(items)
-                renderList()
-            }
-        }
+        row.setOnClickListener { board.setGroceryChecked(item.id, !item.checked) }
     }
 }

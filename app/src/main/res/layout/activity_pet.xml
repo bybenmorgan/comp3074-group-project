@@ -37,11 +37,14 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/open_home"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:layout_weight="1"
                         android:accessibilityHeading="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:contentDescription="@string/open_home"
                         android:text="@string/dashboard_title"
                         android:textAppearance="@style/TextAppearance.Household.Heading"
                         android:textSize="25sp"
@@ -314,6 +317,28 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:paddingTop="4dp" />
+
+                            <TextView
+                                android:id="@+id/pet_status"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="12dp"
+                                android:textAppearance="@style/TextAppearance.Household.Caption"
+                                android:visibility="gone" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/pet_retry"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/expense_retry"
+                                android:visibility="gone" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/pet_discard"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/list_discard"
+                                android:visibility="gone" />
 
                             <TextView
                                 android:id="@+id/appointment_empty"

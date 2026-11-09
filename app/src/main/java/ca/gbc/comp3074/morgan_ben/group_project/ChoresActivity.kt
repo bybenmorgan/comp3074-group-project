@@ -11,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,18 +20,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ChoresActivity : AppCompatActivity() {
     private val store by lazy { HouseholdRepository(this) }
+    private val board by viewModels<HouseholdBoardViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!requireHousehold()) return
         val systemBarColor = getColor(R.color.dashboard_cream)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor),
             navigationBarStyle = SystemBarStyle.light(systemBarColor, systemBarColor)
         )
         setContentView(R.layout.activity_chores)
+        watchAccount()
         bindHouseholdChrome(store)
         findViewById<TextView>(R.id.chores_today_date).text = HouseholdRepository.todayLong()
-        findViewById<MaterialButton>(R.id.feature_dashboard).setOnClickListener { finish() }
         findViewById<MaterialButton>(R.id.feature_groceries).setOnClickListener {
             startActivity(Intent(this, GroceriesActivity::class.java))
             finish()
@@ -44,7 +47,13 @@ class ChoresActivity : AppCompatActivity() {
             finish()
         }
         findViewById<MaterialButton>(R.id.add_chore).setOnClickListener { showAddDialog() }
-        renderList()
+        findViewById<MaterialButton>(R.id.chore_retry).setOnClickListener { board.retry() }
+        findViewById<MaterialButton>(R.id.chore_discard).setOnClickListener { board.discardFailedSave() }
+        board.changed.observe(this) {
+            if (!requireHousehold()) return@observe
+            bindHouseholdChrome(store)
+            renderList()
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.chores_main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -54,11 +63,13 @@ class ChoresActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (!requireHousehold()) return
         bindHouseholdChrome(store)
-        renderList()
+        board.refresh(chores = true, groceries = false, pet = false)
     }
 
     private fun showAddDialog() {
+        if (!board.canEdit) return
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_chore, null)
         val titleInput = dialogView.findViewById<EditText>(R.id.chore_title_input)
         val assigneeInput = dialogView.findViewById<EditText>(R.id.chore_assignee_input)
@@ -77,15 +88,7 @@ class ChoresActivity : AppCompatActivity() {
                 } else {
                     getString(R.string.chore_assigned_to, assigneeRaw)
                 }
-                store.saveChores(
-                    store.chores() + ChoreItem(
-                        title,
-                        assignee,
-                        getString(R.string.chore_due_today),
-                        false
-                    )
-                )
-                renderList()
+                board.addChore(title, assignee, getString(R.string.chore_due_today))
             }
             .setNegativeButton(R.string.pet_cancel, null)
             .show()
@@ -97,12 +100,21 @@ class ChoresActivity : AppCompatActivity() {
         val progress = findViewById<ProgressBar>(R.id.chores_progress)
         val progressCount = findViewById<TextView>(R.id.chores_progress_count)
         list.removeAllViews()
-        val items = store.chores()
-        empty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        val items = if (board.ready) board.chores else emptyList()
+        empty.visibility = if (board.ready && items.isEmpty() && board.error == null) View.VISIBLE else View.GONE
+        findViewById<MaterialButton>(R.id.add_chore).isEnabled = board.canEdit && items.size < MAX_HOUSEHOLD_LIST
+        findViewById<TextView>(R.id.chore_status).apply {
+            visibility = if (board.loading || board.saving || board.error != null) View.VISIBLE else View.GONE
+            text = getString(board.error ?: if (board.saving) R.string.list_saving else R.string.list_loading)
+        }
+        findViewById<MaterialButton>(R.id.chore_retry).visibility =
+            if (board.error != null && !board.loading && !board.saving) View.VISIBLE else View.GONE
+        findViewById<MaterialButton>(R.id.chore_discard).visibility =
+            if (board.failedSave) View.VISIBLE else View.GONE
         val inflater = LayoutInflater.from(this)
-        items.forEachIndexed { index, item ->
+        items.forEach { item ->
             val row = inflater.inflate(R.layout.item_chore, list, false)
-            bindItem(row, item, index)
+            bindItem(row, item)
             list.addView(row)
         }
         val done = items.count { it.done }
@@ -111,20 +123,12 @@ class ChoresActivity : AppCompatActivity() {
         progressCount.text = getString(R.string.chores_progress_count, done, items.size)
     }
 
-    private fun bindItem(row: View, item: ChoreItem, index: Int) {
+    private fun bindItem(row: View, item: ChoreItem) {
         val check = row.findViewById<ImageView>(R.id.chore_check)
         row.findViewById<TextView>(R.id.chore_title).text = item.title
         row.findViewById<TextView>(R.id.chore_assignee).text = item.assignee
         row.findViewById<TextView>(R.id.chore_due).text = item.due
         check.setImageResource(if (item.done) R.drawable.ic_checkbox_checked else R.drawable.ic_checkbox)
-        row.setOnClickListener {
-            val items = store.chores().toMutableList()
-            if (index in items.indices) {
-                val current = items[index]
-                items[index] = current.copy(done = !current.done)
-                store.saveChores(items)
-                renderList()
-            }
-        }
+        row.setOnClickListener { board.setChoreDone(item.id, !item.done) }
     }
 }
